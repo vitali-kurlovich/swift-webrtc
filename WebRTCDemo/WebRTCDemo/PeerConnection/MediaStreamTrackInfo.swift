@@ -11,19 +11,18 @@ struct RTCMediaStreamTrackInfo: View {
 
     var body: some View {
         TwoColumn {
-            
             TwoColumnRow {
                 Text("King")
             } second: {
                 Text(track.kind)
             }
-            
+
             TwoColumnRow {
                 Text("TrackId")
             } second: {
                 Text(track.trackId)
             }
-            
+
             TwoColumnRow {
                 Text("readyState")
             } second: {
@@ -57,7 +56,7 @@ extension RTCMediaStreamTrackState: @retroactive CustomStringConvertible {
 
 /*
 
- /* 
+ /*
   * Represents the state of the track. This exposes the same states in C++.
   */
  public enum RTCMediaStreamTrackState : Int, @unchecked Sendable {
@@ -73,7 +72,7 @@ extension RTCMediaStreamTrackState: @retroactive CustomStringConvertible {
 
  open class RTCMediaStreamTrack : NSObject {
 
-     /* 
+     /*
       * The kind of track. For example, "audio" if this track represents an audio
       * track and "video" if this track represents a video track.
       */

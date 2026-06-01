@@ -16,7 +16,7 @@ extension AppConfiguration {
     convenience init() {
         let provider = InMemoryProvider(
             name: "default-config",
-            values: [:]
+            values: [:],
         )
 
         let reader = ConfigReader(provider: provider)

@@ -6,20 +6,19 @@ import SwiftUI
 import SwiftUIComponents
 import SwiftWebRTC
 
-
 extension DataChannelState: @retroactive CustomStringConvertible {
     public var description: String {
         switch self {
         case .connecting:
-            return "Connecting"
+            "Connecting"
         case .open:
-            return "Open"
+            "Open"
         case .closing:
-            return "Closing"
+            "Closing"
         case .closed:
-            return "Closed"
+            "Closed"
         case .unknown:
-            return "Uncknown"
+            "Uncknown"
         }
     }
 }
@@ -28,15 +27,15 @@ struct DataChannelStateColorResolver: StatusIndicatorColorResolver {
     func resolveColor(for state: DataChannelState) -> Color {
         switch state {
         case .connecting:
-            return Color.orange
+            Color.orange
         case .open:
-            return Color.green
+            Color.green
         case .closing:
-            return Color.red
+            Color.red
         case .closed:
-            return Color.secondary
+            Color.secondary
         case .unknown:
-            return Color.secondary
+            Color.secondary
         }
     }
 }
