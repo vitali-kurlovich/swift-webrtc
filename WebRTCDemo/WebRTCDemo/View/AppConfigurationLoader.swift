@@ -10,20 +10,23 @@ enum AppLoaderState {
     case error(any Error)
 }
 
-struct AppLoader<Content: View>: View {
+struct AppConfigurationLoader<Content: View>: View {
     @State
     private var state: AppLoaderState = .inProgress
 
-    let content: Content
+    @ViewBuilder let content: () -> Content
 
-    init(@ViewBuilder content: () -> Content) {
-        self.content = content()
+    let onReady: (AppConfiguration) -> Void
+
+    init(onReady: @escaping (AppConfiguration) -> Void = { _ in }, @ViewBuilder content: @escaping () -> Content) {
+        self.content = content
+        self.onReady = onReady
     }
 
     var body: some View {
         switch state {
         case let .ready(appConfiguration):
-            content.environment(\.appConfiguration, appConfiguration)
+            content().environment(\.appConfiguration, appConfiguration)
         case .inProgress:
             ProgressView("Loading settings")
                 .task {
@@ -33,10 +36,11 @@ struct AppLoader<Content: View>: View {
                             let reader = try await coordinator.reader
                             let configuration = AppConfiguration(reader: reader)
 
-                            self.state = .ready(configuration)
+                            onReady(configuration)
+                            state = .ready(configuration)
 
                         } catch {
-                            self.state = .error(error)
+                            state = .error(error)
                         }
                     }
                 }
@@ -45,14 +49,24 @@ struct AppLoader<Content: View>: View {
                 Text(error.localizedDescription)
             }
             .refreshable {
-                self.state = .inProgress
+                state = .inProgress
             }
         }
     }
 }
 
+extension AppConfigurationLoader {
+    func onReady(_ ready: @escaping (AppConfiguration) -> Void) -> Self {
+        .init(onReady: ready, content: content)
+    }
+}
+
 #Preview {
-    AppLoader {
+    AppConfigurationLoader {
         IceServersListView()
+    }.onReady { config in
+        print("Ready")
+        print("signalingServer: \(config.signalingServer)")
+        print("iceServers: \(config.iceServers)")
     }
 }

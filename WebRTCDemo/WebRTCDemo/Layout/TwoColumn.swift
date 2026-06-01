@@ -19,7 +19,7 @@ struct TwoColumnRow<Primary: View, Second: View>: View {
     @ViewBuilder let second: () -> Second
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
             primary()
             second()
                 .alignmentGuide(.column) { dims in
@@ -64,7 +64,7 @@ struct TwoColumn<Content: View>: View {
         TwoColumnRow {
             Text("Name 444444")
         } second: {
-            Text("dddd dd  d dvalue")
+            Text("In SwiftUI, you can create a multiline text by simply using the Text view. By default, if the text content is too long for a single line, it will wrap onto multiple lines. However, you can control the number of lines and other properties of the text. Here's how to create multiline text")
         }
     }
 }

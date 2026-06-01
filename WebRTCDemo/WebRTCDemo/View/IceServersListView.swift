@@ -16,7 +16,7 @@ struct IceServersListView: View {
 }
 
 #Preview {
-    AppLoader {
+    AppConfigurationLoader {
         IceServersListView()
     }
 }

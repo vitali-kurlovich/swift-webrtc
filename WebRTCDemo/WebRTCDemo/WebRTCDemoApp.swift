@@ -6,11 +6,18 @@ import SwiftUI
 
 @main
 struct WebRTCDemoApp: App {
+    @State
+    private var connectionCoordinator = ConnectionCoordinator()
+
     var body: some Scene {
         WindowGroup {
-            AppLoader {
+            AppConfigurationLoader {
                 MainView()
-            }.useDefaultStatusGlassStyle()
+                    .environment(\.connectionCoordinator, connectionCoordinator)
+            }.onReady { configuration in
+                connectionCoordinator.update(with: configuration)
+            }
+            .useDefaultStatusGlassStyle()
         }
     }
 }

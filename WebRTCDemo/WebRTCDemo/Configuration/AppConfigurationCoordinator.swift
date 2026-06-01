@@ -46,9 +46,9 @@ private extension AppConfigurationCoordinator {
 
         do {
             let path = FilePath(filePath)
-            return try ConfigReader(
-                provider: await FileProvider<JSONSnapshot>(filePath: path),
-                accessReporter: AccessLogger(logger: logger)
+            return try await ConfigReader(
+                provider: FileProvider<JSONSnapshot>(filePath: path),
+                accessReporter: AccessLogger(logger: logger),
             )
         } catch {
             throw AppConfigurationError.fileProviderFaild
