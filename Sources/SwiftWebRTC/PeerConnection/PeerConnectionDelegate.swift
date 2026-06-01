@@ -5,59 +5,84 @@
 import WebRTC
 
 final class PeerConnectionDelegate: NSObject, RTCPeerConnectionDelegate {
-    weak var connection: PeerConnection? {
-        didSet {
-            peerConnection?.delegate = self
-        }
-    }
+    weak var connection: PeerConnection?
 
+    @MainActor
     private var peerConnection: RTCPeerConnection? {
         connection?.peerConnection
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCPeerConnectionState) {
-        assert(self.peerConnection === peerConnection)
-        connection?.connectionState = .init(newState)
+    func peerConnection(_: RTCPeerConnection, didChange newState: RTCPeerConnectionState) {
+        guard let connection else { return }
+
+        Task { @MainActor [connection] in
+            // assert(connection.peerConnection === peerConnection)
+            connection.connectionState = .init(newState)
+        }
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didChange stateChanged: RTCSignalingState) {
-        assert(self.peerConnection === peerConnection)
-        connection?.signalingState = .init(stateChanged)
+    func peerConnection(_: RTCPeerConnection, didChange stateChanged: RTCSignalingState) {
+        guard let connection else { return }
+        Task { @MainActor in
+            // assert(self.peerConnection === peerConnection)
+            connection.signalingState = .init(stateChanged)
+        }
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceConnectionState) {
-        assert(self.peerConnection === peerConnection)
+    func peerConnection(_: RTCPeerConnection, didChange newState: RTCIceConnectionState) {
+        guard let connection else { return }
 
-        connection?.iceConnectionState = .init(newState)
+        Task { @MainActor in
+            // assert(self.peerConnection === peerConnection)
+
+            connection.iceConnectionState = .init(newState)
+        }
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceGatheringState) {
-        assert(self.peerConnection === peerConnection)
-        connection?.iceGatheringState = .init(newState)
+    func peerConnection(_: RTCPeerConnection, didChange newState: RTCIceGatheringState) {
+        guard let connection else { return }
+        Task { @MainActor in
+            // assert(self.peerConnection === peerConnection)
+            connection.iceGatheringState = .init(newState)
+        }
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didAdd _: RTCMediaStream) {
-        assert(self.peerConnection === peerConnection)
+    func peerConnection(_: RTCPeerConnection, didAdd _: RTCMediaStream) {
+        guard let connection else { return }
+
+        Task { @MainActor in
+            // assert(self.peerConnection === peerConnection)
+        }
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didRemove _: RTCMediaStream) {
-        assert(self.peerConnection === peerConnection)
+    func peerConnection(_: RTCPeerConnection, didRemove _: RTCMediaStream) {
+        Task { @MainActor in
+            // assert(self.peerConnection === peerConnection)
+        }
     }
 
-    func peerConnectionShouldNegotiate(_ peerConnection: RTCPeerConnection) {
-        assert(self.peerConnection === peerConnection)
+    func peerConnectionShouldNegotiate(_: RTCPeerConnection) {
+        Task { @MainActor in
+            //  assert(self.peerConnection === peerConnection)
+        }
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate _: RTCIceCandidate) {
-        assert(self.peerConnection === peerConnection)
+    func peerConnection(_: RTCPeerConnection, didGenerate _: RTCIceCandidate) {
+        Task { @MainActor in
+            // assert(self.peerConnection === peerConnection)
+        }
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didRemove _: [RTCIceCandidate]) {
-        assert(self.peerConnection === peerConnection)
+    func peerConnection(_: RTCPeerConnection, didRemove _: [RTCIceCandidate]) {
+        Task { @MainActor in
+            // assert(self.peerConnection === peerConnection)
+        }
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didOpen _: RTCDataChannel) {
-        assert(connection === peerConnection)
+    func peerConnection(_: RTCPeerConnection, didOpen _: RTCDataChannel) {
+        Task { @MainActor in
+            //  assert(connection === peerConnection)
+        }
     }
 }
 

@@ -11,6 +11,7 @@ public enum PeerConnectionError: Error {
 }
 
 @Observable
+@MainActor
 public final class PeerConnection {
     private let factory: RTCPeerConnectionFactory
     private let configuration: RTCConfiguration
@@ -40,6 +41,7 @@ public final class PeerConnection {
         }
 
         peerConnection = connection
+        peerConnection.delegate = connectionDelegate
 
         signalingState = .init(connection.signalingState)
         iceConnectionState = .init(connection.iceConnectionState)
