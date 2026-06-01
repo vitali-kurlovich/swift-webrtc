@@ -20,7 +20,7 @@ final class ConnectionCoordinator {
 
     private var iceServers: [String] = []
 
-    var status: Status = .uninitialized 
+    var status: Status = .uninitialized
 
     func update(with configuration: AppConfiguration) {
         guard Set(configuration.iceServers) != Set(iceServers) else {

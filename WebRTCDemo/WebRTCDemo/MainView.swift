@@ -11,24 +11,33 @@ struct MainView: View {
         // IceServersListView()
 
         TabView {
-            Tab("Coonection", systemImage: "tray.and.arrow.down.fill") {
-                Coonection()
+            Tab("Peer Coonection", systemImage: "network") {
+                NavigationStack {
+                    Coonection()
+                }
             }
 
-            Tab("Sent", systemImage: "tray.and.arrow.up.fill") {
+            Tab("Video", systemImage: "video") {
                 // SentView()
             }
 
-            Tab("Account", systemImage: "person.crop.circle.fill") {
+            Tab("Messages", systemImage: "message") {
+                // SentView()
+            }
+
+            Tab("Logs", systemImage: "list.dash") {
                 // AccountView()
             }
-        }
+        }.tabViewStyle(.sidebarAdaptable)
     }
 }
 
 struct Coonection: View {
     @Environment(\.connectionCoordinator)
     var connectionCoordinator
+
+    @State
+    private var showInspector: Bool = false
 
     var body: some View {
         switch connectionCoordinator.status {
@@ -37,7 +46,16 @@ struct Coonection: View {
                 .symbolEffect(.rotate.byLayer, options: .repeat(.continuous))
 
         case let .ready(connection):
-            PeerConnectionMessages(connection: connection)
+            PeerConnectionView(connection: connection)
+                .inspector(isPresented: $showInspector) {
+                    PeerConnectionInfo(connection: connection)
+                }.toolbar {
+                    Button("", systemImage: "info.circle") {
+                        withAnimation {
+                            showInspector.toggle()
+                        }
+                    }
+                }
 
         case let .faild(error):
             ContentUnavailableView("Faild", systemImage: "exclamationmark.circle.fill", description: Text(error.localizedDescription))
@@ -46,17 +64,24 @@ struct Coonection: View {
     }
 }
 
-struct PeerConnectionMessages: View {
-    /// @State
-    private let connection: PeerConnection
+struct PeerConnectionView: View {
+    let connection: PeerConnection
+
+    var body: some View {
+        Button("offer") {
+            Task {
+                let dsc = try await connection.offer()
+                // offerSessionDescription = dsc
+            }
+        }
+    }
+}
+
+struct PeerConnectionInfo: View {
+    let connection: PeerConnection
 
     @State
     private var offerSessionDescription: SessionDescription?
-
-    init(connection: PeerConnection, offerSessionDescription: SessionDescription? = nil) {
-        self.connection = connection
-        self.offerSessionDescription = offerSessionDescription
-    }
 
     var body: some View {
         ScrollView {
@@ -66,12 +91,6 @@ struct PeerConnectionMessages: View {
                 SessionDescriptionInfo(session: offerSessionDescription)
             }
 
-            Button("offer") {
-                Task {
-                    let dsc = try await connection.offer()
-                    offerSessionDescription = dsc
-                }
-            }
         }.safeAreaPadding()
     }
 }
