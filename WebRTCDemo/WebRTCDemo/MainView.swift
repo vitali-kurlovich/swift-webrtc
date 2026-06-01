@@ -2,9 +2,12 @@
 //  Created by Kurlovich Vitali on 5/23/26.
 //
 
+import Logging
 import SwiftUI
 import SwiftUIComponents
 import SwiftWebRTC
+
+private let logging = Logger(label: "MainView")
 
 struct MainView: View {
     var body: some View {
@@ -26,7 +29,7 @@ struct MainView: View {
             }
 
             Tab("Logs", systemImage: "list.dash") {
-                // AccountView()
+                LogsView()
             }
         }.tabViewStyle(.sidebarAdaptable)
     }
@@ -64,14 +67,39 @@ struct Coonection: View {
     }
 }
 
+protocol SignalProvider {
+    func sendOffer(_ session: SessionDescription) async throws
+
+    func sendAnswer(_ session: SessionDescription) async throws
+}
+
 struct PeerConnectionView: View {
     let connection: PeerConnection
 
     var body: some View {
-        Button("offer") {
-            Task {
-                let dsc = try await connection.offer()
+        Button("Send Offer") {
+            Task { [connection] in
+                do {
+                    logging.info("Send Offer")
+                    _ = try await connection.offer()
+                } catch {
+                    logging.error("\(error.localizedDescription)", error: error)
+                }
+
                 // offerSessionDescription = dsc
+            }
+        }
+
+        Button("Send Ansver") {
+            Task {
+                do {
+                    logging.info("Send Ansver")
+                    _ = try await connection.answer()
+                    // offerSessionDescription = dsc
+
+                } catch {
+                    logging.error("\(error.localizedDescription)", error: error)
+                }
             }
         }
     }
@@ -84,14 +112,17 @@ struct PeerConnectionInfo: View {
     private var offerSessionDescription: SessionDescription?
 
     var body: some View {
-        ScrollView {
-            PeerConnectionStatusInfo(connection: connection)
-
-            if let offerSessionDescription {
-                SessionDescriptionInfo(session: offerSessionDescription)
+        Form {
+            Section("Status") {
+                PeerConnectionStatusInfo(connection: connection)
             }
 
-        }.safeAreaPadding()
+            Section {
+                if let session = connection.localDescription {
+                    SessionDescriptionInfo(session: session)
+                }
+            }
+        } // .safeAreaPadding()
     }
 }
 

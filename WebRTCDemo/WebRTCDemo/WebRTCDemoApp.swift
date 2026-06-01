@@ -9,6 +9,10 @@ struct WebRTCDemoApp: App {
     @State
     private var connectionCoordinator = ConnectionCoordinator()
 
+    init() {
+        prepareLogging()
+    }
+
     var body: some Scene {
         WindowGroup {
             AppConfigurationLoader {
@@ -19,5 +23,11 @@ struct WebRTCDemoApp: App {
             }
             .useDefaultStatusGlassStyle()
         }
+    }
+}
+
+private extension WebRTCDemoApp {
+    func prepareLogging() {
+        LoggingBootstrap.default.bootstrap()
     }
 }
