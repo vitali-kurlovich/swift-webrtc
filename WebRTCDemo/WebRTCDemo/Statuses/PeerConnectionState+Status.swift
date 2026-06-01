@@ -6,25 +6,23 @@ import SwiftUI
 import SwiftUIComponents
 import SwiftWebRTC
 
-
-
 extension PeerConnectionState: @retroactive CustomStringConvertible {
     public var description: String {
         switch self {
         case .new:
-            return "New"
+            "New"
         case .connecting:
-            return "Connecting"
+            "Connecting"
         case .connected:
-            return "Connected"
+            "Connected"
         case .disconnected:
-            return "Disconnected"
+            "Disconnected"
         case .failed:
-            return "Failed"
+            "Failed"
         case .closed:
-            return "Closed"
+            "Closed"
         case .unknown:
-            return "Uncknown"
+            "Uncknown"
         }
     }
 }
@@ -33,19 +31,19 @@ struct PeerConnectionStatusColorResolver: StatusIndicatorColorResolver {
     func resolveColor(for state: PeerConnectionState) -> Color {
         switch state {
         case .new:
-            return Color.accentColor
+            Color.accentColor
         case .connecting:
-            return Color.orange
+            Color.orange
         case .connected:
-            return Color.green
+            Color.green
         case .disconnected:
-            return Color.secondary
+            Color.secondary
         case .failed:
-            return Color.red
+            Color.red
         case .closed:
-            return Color.secondary
+            Color.secondary
         case .unknown:
-            return Color.secondary
+            Color.secondary
         }
     }
 }

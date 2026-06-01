@@ -6,19 +6,17 @@ import SwiftUI
 import SwiftUIComponents
 import SwiftWebRTC
 
-
 extension IceGatheringState: @retroactive CustomStringConvertible {
     public var description: String {
         switch self {
         case .new:
-            return "New"
+            "New"
         case .gathering:
-            return "Gathering"
+            "Gathering"
         case .complete:
-            return "Complete"
+            "Complete"
         case .unknown:
-            return "Uncknown"
-        
+            "Uncknown"
         }
     }
 }
@@ -27,13 +25,13 @@ struct IceGatheringStateColorResolver: StatusIndicatorColorResolver {
     func resolveColor(for state: IceGatheringState) -> Color {
         switch state {
         case .new:
-            return Color.secondary
+            Color.secondary
         case .gathering:
-            return Color.orange
+            Color.orange
         case .complete:
-            return Color.accentColor
+            Color.accentColor
         case .unknown:
-            return Color.secondary
+            Color.secondary
         }
     }
 }

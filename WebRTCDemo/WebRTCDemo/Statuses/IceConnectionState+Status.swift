@@ -6,29 +6,27 @@ import SwiftUI
 import SwiftUIComponents
 import SwiftWebRTC
 
-
-
 extension IceConnectionState: @retroactive CustomStringConvertible {
     public var description: String {
         switch self {
         case .new:
-            return "New"
+            "New"
         case .checking:
-            return "Checking"
+            "Checking"
         case .connected:
-            return "Connected"
+            "Connected"
         case .completed:
-            return "Completed"
+            "Completed"
         case .failed:
-            return "Failed"
+            "Failed"
         case .disconnected:
-            return "Disconnected"
+            "Disconnected"
         case .closed:
-            return "Closed"
+            "Closed"
         case .count:
-            return "Count"
+            "Count"
         case .unknown:
-            return "Uncknown"
+            "Uncknown"
         }
     }
 }
@@ -37,24 +35,23 @@ struct IceConnectionStateColorResolver: StatusIndicatorColorResolver {
     func resolveColor(for state: IceConnectionState) -> Color {
         switch state {
         case .new:
-            return Color.orange
+            Color.orange
         case .checking:
-            return Color.yellow
+            Color.yellow
         case .connected:
-            return Color.green
+            Color.green
         case .completed:
-            return Color.green
+            Color.green
         case .failed:
-            return Color.red
+            Color.red
         case .disconnected:
-            return Color.secondary
+            Color.secondary
         case .closed:
-            return Color.secondary
+            Color.secondary
         case .count:
-            return Color.secondary
-       
+            Color.secondary
         case .unknown:
-            return Color.secondary
+            Color.secondary
         }
     }
 }

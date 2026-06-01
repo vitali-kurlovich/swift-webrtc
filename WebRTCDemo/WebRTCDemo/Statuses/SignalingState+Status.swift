@@ -6,26 +6,23 @@ import SwiftUI
 import SwiftUIComponents
 import SwiftWebRTC
 
-
-
 extension SignalingState: @retroactive CustomStringConvertible {
     public var description: String {
         switch self {
         case .stable:
-            return "Stable"
+            "Stable"
         case .haveLocalOffer:
-            return "Have Local Offer"
+            "Have Local Offer"
         case .haveLocalPrAnswer:
-            return "Have Local Pr Answer"
+            "Have Local Pr Answer"
         case .haveRemoteOffer:
-            return "Have Remote Offer"
+            "Have Remote Offer"
         case .haveRemotePrAnswer:
-            return "Have Remote Pr Answer"
+            "Have Remote Pr Answer"
         case .closed:
-            return "Closed"
+            "Closed"
         case .unknown:
-            return "Uncknown"
-       
+            "Uncknown"
         }
     }
 }
@@ -34,19 +31,19 @@ struct SignalingStateColorResolver: StatusIndicatorColorResolver {
     func resolveColor(for state: SignalingState) -> Color {
         switch state {
         case .stable:
-            return Color.green
+            Color.green
         case .haveLocalOffer:
-            return Color.yellow
+            Color.yellow
         case .haveLocalPrAnswer:
-            return Color.yellow
+            Color.yellow
         case .haveRemoteOffer:
-            return Color.orange
+            Color.orange
         case .haveRemotePrAnswer:
-            return Color.orange
+            Color.orange
         case .closed:
-            return Color.secondary
+            Color.secondary
         case .unknown:
-            return Color.gray
+            Color.gray
         }
     }
 }

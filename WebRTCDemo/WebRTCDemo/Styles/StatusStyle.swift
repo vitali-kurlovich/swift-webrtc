@@ -9,73 +9,85 @@ import SwiftWebRTC
 extension View {
     func useDefaultStatusStyle() -> some View {
         statusStyle(
-            DefaultStatusStyle(DataChannelStateColorResolver())
+            DefaultStatusStyle(DataChannelStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusStyle(IceConnectionStateColorResolver())
+            DefaultStatusStyle(IceConnectionStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusStyle(IceGatheringStateColorResolver())
+            DefaultStatusStyle(IceGatheringStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusStyle(SignalingStateColorResolver())
+            DefaultStatusStyle(SignalingStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusStyle(PeerConnectionStatusColorResolver())
+            DefaultStatusStyle(PeerConnectionStatusColorResolver()),
+        )
+        .statusStyle(
+            DefaultStatusStyle(SdpTypeStateColorResolver()),
         )
     }
 
     func useDefaultStatusCompactStyle() -> some View {
         statusStyle(
-            DefaultStatusCompactStyle(DataChannelStateColorResolver())
+            DefaultStatusCompactStyle(DataChannelStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusCompactStyle(IceConnectionStateColorResolver())
+            DefaultStatusCompactStyle(IceConnectionStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusCompactStyle(IceGatheringStateColorResolver())
+            DefaultStatusCompactStyle(IceGatheringStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusCompactStyle(SignalingStateColorResolver())
+            DefaultStatusCompactStyle(SignalingStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusCompactStyle(PeerConnectionStatusColorResolver())
+            DefaultStatusCompactStyle(PeerConnectionStatusColorResolver()),
+        )
+        .statusStyle(
+            DefaultStatusCompactStyle(SdpTypeStateColorResolver()),
         )
     }
 
     func useDefaultStatusGlassStyle() -> some View {
         statusStyle(
-            DefaultStatusGlassStyle(DataChannelStateColorResolver())
+            DefaultStatusGlassStyle(DataChannelStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusGlassStyle(IceConnectionStateColorResolver())
+            DefaultStatusGlassStyle(IceConnectionStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusGlassStyle(IceGatheringStateColorResolver())
+            DefaultStatusGlassStyle(IceGatheringStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusGlassStyle(SignalingStateColorResolver())
+            DefaultStatusGlassStyle(SignalingStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusGlassStyle(PeerConnectionStatusColorResolver())
+            DefaultStatusGlassStyle(PeerConnectionStatusColorResolver()),
+        )
+        .statusStyle(
+            DefaultStatusGlassStyle(SdpTypeStateColorResolver()),
         )
     }
 
     func useDefaultStatusCompactGlassStyle() -> some View {
         statusStyle(
-            DefaultStatusCompactGlassStyle(DataChannelStateColorResolver())
+            DefaultStatusCompactGlassStyle(DataChannelStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusCompactGlassStyle(IceConnectionStateColorResolver())
+            DefaultStatusCompactGlassStyle(IceConnectionStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusCompactGlassStyle(IceGatheringStateColorResolver())
+            DefaultStatusCompactGlassStyle(IceGatheringStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusCompactGlassStyle(SignalingStateColorResolver())
+            DefaultStatusCompactGlassStyle(SignalingStateColorResolver()),
         )
         .statusStyle(
-            DefaultStatusCompactGlassStyle(PeerConnectionStatusColorResolver())
+            DefaultStatusCompactGlassStyle(PeerConnectionStatusColorResolver()),
+        )
+        .statusStyle(
+            DefaultStatusCompactGlassStyle(SdpTypeStateColorResolver()),
         )
     }
 }
@@ -106,6 +118,7 @@ private struct PreviewStatusCollection: View {
             PreviewStatus(IceGatheringState.self)
             PreviewStatus(PeerConnectionState.self)
             PreviewStatus(SignalingState.self)
+            PreviewStatus(SdpType.self)
         }
     }
 }
