@@ -8,6 +8,7 @@ import SwiftUI
 struct WebRTCDemoApp: App {
     @State
     private var connectionCoordinator = ConnectionCoordinator()
+    private let loggingBootstrap: LoggingBootstrap = .default
 
     init() {
         prepareLogging()
@@ -28,6 +29,6 @@ struct WebRTCDemoApp: App {
 
 private extension WebRTCDemoApp {
     func prepareLogging() {
-        LoggingBootstrap.default.bootstrap()
+        loggingBootstrap.bootstrap()
     }
 }

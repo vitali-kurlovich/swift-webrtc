@@ -37,9 +37,7 @@ extension LoggingBootstrap {
             var consoleHandler = StreamLogHandler.standardOutput(label: label)
             consoleHandler.logLevel = .debug
 
-            let subsystem = Bundle.main.bundleIdentifier ?? ""
-
-            let osLogHandler = OSLogHandler(subsystem: subsystem, metadata: .init(), logLevel: .debug)
+            let osLogHandler = OSLogHandler(label: label, subsystem: "Events", metadata: .init(), logLevel: .debug)
 
             return MultiplexLogHandler([
                 osLogHandler,

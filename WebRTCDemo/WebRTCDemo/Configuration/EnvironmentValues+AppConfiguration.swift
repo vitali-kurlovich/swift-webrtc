@@ -8,4 +8,4 @@ extension EnvironmentValues {
     @Entry var appConfiguration: AppConfiguration = .init()
 }
 
-// PeerConnection+AppConfiguration
+// EnvironmentValues+AppConfiguration

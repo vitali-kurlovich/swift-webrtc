@@ -6,6 +6,7 @@ import Logging
 import OSLog
 
 struct OSLogHandler: @preconcurrency LogHandler {
+    let label: String
     let subsystem: String
 
     var metadata: Logging.Logger.Metadata
@@ -22,8 +23,7 @@ struct OSLogHandler: @preconcurrency LogHandler {
     }
 
     @MainActor func log(event: LogEvent) {
-        let category = "category"
-        let logger = Logger(subsystem: subsystem, category: category)
+        let logger = Logger(subsystem: subsystem, category: label)
 
         logger.log(level: .init(event.level), "\(event.message.description)")
     }

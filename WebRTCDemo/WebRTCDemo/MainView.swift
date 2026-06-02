@@ -3,6 +3,7 @@
 //
 
 import Logging
+import OSLog
 import SwiftUI
 import SwiftUIComponents
 import SwiftWebRTC
@@ -76,29 +77,34 @@ protocol SignalProvider {
 struct PeerConnectionView: View {
     let connection: PeerConnection
 
+    @Environment(\.loggingEvents)
+    var loggingEvents
+
+    @Environment(\.loggingSystem)
+    var loggingSystem
+
     var body: some View {
         Button("Send Offer") {
             Task { [connection] in
                 do {
-                    logging.info("Send Offer")
+                    loggingEvents.system.info("Send Offer")
                     _ = try await connection.offer()
                 } catch {
-                    logging.error("\(error.localizedDescription)", error: error)
+                    loggingEvents.system.error("\(error.localizedDescription)", error: error)
                 }
-
-                // offerSessionDescription = dsc
             }
         }
 
         Button("Send Ansver") {
             Task {
                 do {
-                    logging.info("Send Ansver")
+                    loggingEvents.system.info("Send Ansver")
                     _ = try await connection.answer()
-                    // offerSessionDescription = dsc
 
                 } catch {
-                    logging.error("\(error.localizedDescription)", error: error)
+                    loggingEvents.system.error("\(error.localizedDescription)", error: error)
+
+                    loggingSystem.system.error("\(error.localizedDescription)")
                 }
             }
         }
@@ -122,7 +128,7 @@ struct PeerConnectionInfo: View {
                     SessionDescriptionInfo(session: session)
                 }
             }
-        } // .safeAreaPadding()
+        }
     }
 }
 
