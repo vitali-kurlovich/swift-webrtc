@@ -41,30 +41,53 @@ final class PeerConnectionDelegate: NSObject, RTCPeerConnectionDelegate, @unchec
     func peerConnection(_ peerConnection: RTCPeerConnection, didAdd mediaStream: RTCMediaStream) {
         assert(connection.peerConnection === peerConnection)
         logger?.debug("RTCPeerConnectionDelegate didAdd mediaStream: \(mediaStream.description)")
+
+        // TODO:
+        continuation?.yield(.addMediaStream)
     }
 
     func peerConnection(_ peerConnection: RTCPeerConnection, didRemove mediaStream: RTCMediaStream) {
         assert(connection.peerConnection === peerConnection)
         logger?.debug("RTCPeerConnectionDelegate didRemove mediaStream: \(mediaStream.description)")
+
+        // TODO:
+        continuation?.yield(.removeMediaStream)
     }
 
     func peerConnectionShouldNegotiate(_ peerConnection: RTCPeerConnection) {
         assert(connection.peerConnection === peerConnection)
         logger?.debug("RTCPeerConnectionDelegate peerConnectionShouldNegotiate")
+
+        continuation?.yield(.shouldNegotiate)
     }
 
     func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate candidate: RTCIceCandidate) {
         assert(connection.peerConnection === peerConnection)
         logger?.debug("RTCPeerConnectionDelegate didGenerate candidate: \(candidate.description)")
+
+        let candidate = IceCandidate(candidate)
+        continuation?.yield(.generateCandidate(candidate))
     }
 
     func peerConnection(_ peerConnection: RTCPeerConnection, didRemove candidates: [RTCIceCandidate]) {
         assert(connection.peerConnection === peerConnection)
         logger?.debug("RTCPeerConnectionDelegate didRemove candidates: \(candidates.description)")
+
+        let candidates = candidates.map { IceCandidate($0) }
+        continuation?.yield(.removeCandidateas(candidates))
     }
 
     func peerConnection(_ peerConnection: RTCPeerConnection, didOpen channel: RTCDataChannel) {
         assert(connection.peerConnection === peerConnection)
         logger?.debug("RTCPeerConnectionDelegate didOpen channel: \(channel.description)")
+
+        let channel = DataChannel(channel)
+        continuation?.yield(.openChannel(channel))
     }
+
+    private(set) lazy var events: AsyncStream<PeerConnectionEvent> = AsyncStream { (continuation: AsyncStream<PeerConnectionEvent>.Continuation) in
+        self.continuation = continuation
+    }
+
+    private var continuation: AsyncStream<PeerConnectionEvent>.Continuation?
 }

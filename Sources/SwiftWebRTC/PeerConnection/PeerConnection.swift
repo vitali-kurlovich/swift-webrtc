@@ -11,6 +11,17 @@ public enum PeerConnectionError: Error {
     case cantCreateNewDataChannel
 }
 
+public enum PeerConnectionEvent {
+    case addMediaStream
+    case removeMediaStream
+
+    case shouldNegotiate
+    case generateCandidate(IceCandidate)
+    case removeCandidateas([IceCandidate])
+
+    case openChannel(DataChannel)
+}
+
 @Observable
 public final class PeerConnection: @unchecked Sendable {
     private let factory: RTCPeerConnectionFactory
@@ -71,6 +82,12 @@ public extension PeerConnection {
     }
 }
 
+extension PeerConnection {
+    var events: AsyncStream<PeerConnectionEvent> {
+        connectionDelegate.events
+    }
+}
+
 public extension PeerConnection {
     var logger: Logger? {
         get {
@@ -126,6 +143,7 @@ public extension PeerConnection {
 public extension PeerConnection {
     // MARK: Signaling
 
+    @discardableResult
     func offer(_ options: PeerMediaOption = [.offerToReceiveAudio, .offerToReceiveVideo]) async throws -> SessionDescription {
         do {
             logger?.info("\(String(describing: Self.self)) offer")
@@ -144,6 +162,7 @@ public extension PeerConnection {
         }
     }
 
+    @discardableResult
     func answer(_ options: PeerMediaOption = [.offerToReceiveAudio, .offerToReceiveVideo]) async throws -> SessionDescription {
         do {
             logger?.info("\(String(describing: Self.self)) answer")
@@ -172,11 +191,11 @@ public extension PeerConnection {
 }
 
 public extension PeerConnection {
-    func setRemoteDescription(_ description: SessionDescription) async throws {
+    func setRemote(_ session: SessionDescription) async throws {
         do {
             logger?.info("\(String(describing: Self.self)) setRemoteDescription:")
-            logger?.debug("description: \(description)")
-            try await peerConnection.setRemoteDescription(.init(description))
+            logger?.debug("session: \(session)")
+            try await peerConnection.setRemoteDescription(.init(session))
         } catch {
             logger?.error("\(String(describing: Self.self)) \(error.localizedDescription)", error: error)
             throw error
