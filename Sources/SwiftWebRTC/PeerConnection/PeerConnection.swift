@@ -41,7 +41,6 @@ public final class PeerConnection: @unchecked Sendable {
         }
 
         peerConnection = connection
-        peerConnection.delegate = connectionDelegate
 
         signalingState = .init(connection.signalingState)
         iceConnectionState = .init(connection.iceConnectionState)
@@ -49,6 +48,7 @@ public final class PeerConnection: @unchecked Sendable {
         iceGatheringState = .init(connection.iceGatheringState)
 
         connectionDelegate.connection = self
+        peerConnection.delegate = connectionDelegate
     }
 }
 

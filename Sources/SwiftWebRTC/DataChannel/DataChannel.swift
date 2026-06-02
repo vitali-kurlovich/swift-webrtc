@@ -18,8 +18,8 @@ public final class DataChannel: @unchecked Sendable {
         self.channel = channel
         readyState = DataChannelState(channel.readyState)
         channelDelegate = DataChannelDelegate()
-        channelDelegate.channel = self
 
+        channelDelegate.channel = self
         channel.delegate = channelDelegate
     }
 }
@@ -32,6 +32,12 @@ public extension DataChannel {
         set {
             channelDelegate.logger = newValue
         }
+    }
+}
+
+public extension DataChannel {
+    var messages: AsyncStream<DataBuffer> {
+        channelDelegate.messages
     }
 }
 
@@ -50,10 +56,6 @@ public extension DataChannel {
     func close() {
         logger?.info("\(String(describing: Self.self)) close")
         channel.close()
-    }
-
-    func messages() -> AsyncStream<DataBuffer> {
-        channelDelegate.messages()
     }
 }
 
