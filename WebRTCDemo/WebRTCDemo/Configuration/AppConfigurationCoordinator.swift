@@ -15,8 +15,6 @@ enum AppConfigurationError: Swift.Error {
     case fileProviderFaild
 }
 
-private let logger: Logger = .init(label: "AppConfiguration")
-
 final class AppConfigurationCoordinator {
     let settingsName: String
 
@@ -48,7 +46,7 @@ private extension AppConfigurationCoordinator {
             let path = FilePath(filePath)
             return try await ConfigReader(
                 provider: FileProvider<JSONSnapshot>(filePath: path),
-                accessReporter: AccessLogger(logger: logger),
+                accessReporter: AccessLogger(logger: LoggingEvents.default.configuration),
             )
         } catch {
             throw AppConfigurationError.fileProviderFaild

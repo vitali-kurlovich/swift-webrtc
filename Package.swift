@@ -13,6 +13,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/vitali-kurlovich/webrtc.git", from: "0.148.0"),
+        .package(url: "https://github.com/apple/swift-log", from: "1.13.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -21,6 +22,7 @@ let package = Package(
             name: "SwiftWebRTC",
             dependencies: [
                 .product(name: "WebRTC", package: "webrtc"),
+                .product(name: "Logging", package: "swift-log"),
             ],
         ),
     ],

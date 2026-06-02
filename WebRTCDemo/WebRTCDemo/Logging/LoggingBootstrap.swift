@@ -6,11 +6,11 @@ import Foundation
 import InMemoryLogging
 import Logging
 
-final class LoggingBootstrap {
+final class LoggingBootstrap: @unchecked Sendable {
     private var isBootstrapped: Bool
 
     let inMemoryHandler = InMemoryLogHandler()
-    private let observationLogHandler = ObservationLogHandler()
+    private let eventsReporterHandler = LogEventsReporterHandler()
 
     private init() {
         isBootstrapped = false
@@ -22,8 +22,8 @@ extension LoggingBootstrap {
 }
 
 extension LoggingBootstrap {
-    func events() -> some AsyncSequence<LogEvent, Never> {
-        observationLogHandler.events()
+    var events: AsyncStream<LogEvent> {
+        eventsReporterHandler.events
     }
 }
 
@@ -33,7 +33,7 @@ extension LoggingBootstrap {
             return
         }
 
-        LoggingSystem.bootstrap { [inMemoryHandler, observationLogHandler] label in
+        LoggingSystem.bootstrap { [inMemoryHandler, eventsReporterHandler] label in
             var consoleHandler = StreamLogHandler.standardOutput(label: label)
             consoleHandler.logLevel = .debug
 
@@ -42,7 +42,7 @@ extension LoggingBootstrap {
             return MultiplexLogHandler([
                 osLogHandler,
                 inMemoryHandler,
-                observationLogHandler,
+                eventsReporterHandler,
             ])
         }
 

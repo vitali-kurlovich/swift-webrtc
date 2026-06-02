@@ -18,7 +18,7 @@ final class LogsObserver: ObservableObject {
         self.bootstrap = bootstrap
 
         cancellable = Task { [weak self] in
-            for await _ in bootstrap.events() {
+            for await _ in bootstrap.events {
                 self?.invalidate()
             }
         }

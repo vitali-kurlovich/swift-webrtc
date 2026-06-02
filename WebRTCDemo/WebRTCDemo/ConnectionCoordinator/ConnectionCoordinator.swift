@@ -2,6 +2,7 @@
 //  Created by Kurlovich Vitali on 6/1/26.
 //
 
+import Logging
 import Observation
 import SwiftUI
 import SwiftWebRTC
@@ -36,6 +37,8 @@ final class ConnectionCoordinator {
         do {
             let servers = iceServers.map { IceServer(urlStrings: [$0]) }
             let connection = try PeerConnection(iceServers: servers)
+
+            connection.logger = LoggingEvents.default.webrct
 
             status = .ready(connection)
 
