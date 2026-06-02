@@ -12,25 +12,25 @@ struct PeerConnectionStatusInfo: View {
     var body: some View {
         TwoColumn {
             TwoColumnRow {
-                Text("Connection")
+                Text("Connection").lineLimit(1)
             } second: {
                 Status(state: connection.connectionState)
             }
 
             TwoColumnRow {
-                Text("Signaling")
+                Text("Signaling").lineLimit(1)
             } second: {
                 Status(state: connection.signalingState)
             }
 
             TwoColumnRow {
-                Text("Ice Connection")
+                Text("Ice Connection").lineLimit(1)
             } second: {
                 Status(state: connection.iceConnectionState)
             }
 
             TwoColumnRow {
-                Text("Ice Gathering")
+                Text("Ice Gathering").lineLimit(1)
             } second: {
                 Status(state: connection.iceGatheringState)
             }
