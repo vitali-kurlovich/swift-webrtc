@@ -2,6 +2,7 @@
 //  Created by Kurlovich Vitali on 6/2/26.
 //
 
+import Logging
 import SwiftUI
 import SwiftWebRTC
 
@@ -10,14 +11,14 @@ struct PeerConnectionView: View {
 
     var body: some View {
         Button("Send Offer") {
-            Task { [connection] in
+            Task {
                 try await connection.offer()
             }
         }
 
         Button("Send Ansver") {
             Task {
-                _ = try await connection.answer()
+                try await connection.answer()
             }
         }
     }

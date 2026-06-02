@@ -8,6 +8,10 @@ import SwiftWebRTC
 struct MainView: View {
     var body: some View {
         TabView {
+            Tab("Local Signal Server", systemImage: "personalhotspot") {
+                LocalServerTab()
+            }
+
             Tab("Peer Coonection", systemImage: "network") {
                 CoonectionTab()
             }
@@ -25,12 +29,6 @@ struct MainView: View {
             }
         }.tabViewStyle(.sidebarAdaptable)
     }
-}
-
-protocol SignalProvider {
-    func sendOffer(_ session: SessionDescription) async throws
-
-    func sendAnswer(_ session: SessionDescription) async throws
 }
 
 #Preview {

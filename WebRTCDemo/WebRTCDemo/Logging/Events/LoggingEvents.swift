@@ -33,4 +33,9 @@ extension LoggingEvents {
     var configuration: Logger {
         Logger(label: "WebRCT")
     }
+
+    @inlinable
+    var localServer: Logger {
+        Logger(label: "localServer")
+    }
 }
