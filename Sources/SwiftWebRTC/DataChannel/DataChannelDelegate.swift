@@ -2,36 +2,44 @@
 //  Created by Kurlovich Vitali on 5/28/26.
 //
 
+import Logging
 import WebRTC
 
-final class DataChannelDelegate: NSObject, RTCDataChannelDelegate {
-    weak var channel: DataChannel? {
-        didSet {
-            channel?.channel.delegate = self
-        }
-    }
+final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Sendable {
+    weak var channel: DataChannel?
+
+    var logger: Logger?
 
     private let handlersStorage = DataChannelHandlersStorage()
 
-    private var dataChannel: RTCDataChannel? {
-        channel?.channel
-    }
-
+    /** The data channel state changed. */
     func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {
-        assert(self.dataChannel === dataChannel)
+        assert(channel?.channel === dataChannel)
 
-        channel?.readyState = DataChannelState(dataChannel.readyState)
+        let readyState = dataChannel.readyState
+        logger?.debug("RTCDataChannelDelegate dataChannelDidChangeState: \(readyState)")
+
+        channel?.readyState = DataChannelState(readyState)
     }
 
+    /** The data channel successfully received a data buffer. */
     func dataChannel(_ dataChannel: RTCDataChannel, didReceiveMessageWith buffer: RTCDataBuffer) {
-        assert(self.dataChannel === dataChannel)
+        assert(channel?.channel === dataChannel)
+        logger?.debug("RTCDataChannelDelegate didReceiveMessageWith: \(buffer.description)")
 
         let buffer = DataBuffer(data: buffer.data, isBinry: buffer.isBinary)
-        Task { [handlersStorage] in
-            await handlersStorage.didReceive(buffer)
-        }
+
+        // TODO: use NotificationCenter for `messages`
     }
 
+    /** The data channel's `bufferedAmount` changed. */
+    func dataChannel(_ dataChannel: RTCDataChannel, didChangeBufferedAmount amount: UInt64) {
+        assert(channel?.channel === dataChannel)
+        logger?.debug("RTCDataChannelDelegate didChangeBufferedAmount: \(amount)")
+    }
+}
+
+extension DataChannelDelegate {
     func messages() -> AsyncStream<DataBuffer> {
         let uuid = UUID()
 
@@ -54,6 +62,19 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate {
         }
     }
 }
+
+/*
+
+ /*  The data channel state changed. */
+ func dataChannelDidChangeState(_ dataChannel: RTCDataChannel)
+
+ /*  The data channel successfully received a data buffer. */
+ func dataChannel(_ dataChannel: RTCDataChannel, didReceiveMessageWith buffer: RTCDataBuffer)
+
+ /*  The data channel's `bufferedAmount` changed. */
+ optional func dataChannel(_ dataChannel: RTCDataChannel, didChangeBufferedAmount amount: UInt64)
+
+ */
 
 private struct DataChannelHandler {
     let handler: @Sendable (DataBuffer) -> Void

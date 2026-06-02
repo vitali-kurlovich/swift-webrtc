@@ -2,30 +2,45 @@
 //  Created by Kurlovich Vitali on 5/27/26.
 //
 
+import Logging
 import Observation
 import WebRTC
 
 @Observable
-public final class DataChannel {
+public final class DataChannel: @unchecked Sendable {
     /** The state of the data channel. */
     public internal(set) var readyState: DataChannelState
 
     let channel: RTCDataChannel
-
     private let channelDelegate: DataChannelDelegate
 
     init(_ channel: RTCDataChannel) {
         self.channel = channel
         readyState = DataChannelState(channel.readyState)
         channelDelegate = DataChannelDelegate()
-
         channelDelegate.channel = self
+
+        channel.delegate = channelDelegate
+    }
+}
+
+public extension DataChannel {
+    var logger: Logger? {
+        get {
+            channelDelegate.logger
+        }
+        set {
+            channelDelegate.logger = newValue
+        }
     }
 }
 
 public extension DataChannel {
     /** Attempt to send `buffer` on this data channel's underlying data transport. */
     func send(_ buffer: DataBuffer) -> Bool {
+        logger?.info("\(String(describing: Self.self)) send")
+        logger?.debug("buffer \(buffer)")
+
         let buffer = RTCDataBuffer(data: buffer.data, isBinary: buffer.isBinry)
 
         return channel.sendData(buffer)
@@ -33,6 +48,7 @@ public extension DataChannel {
 
     /** Closes the data channel. */
     func close() {
+        logger?.info("\(String(describing: Self.self)) close")
         channel.close()
     }
 

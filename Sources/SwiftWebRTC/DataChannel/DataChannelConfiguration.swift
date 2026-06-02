@@ -4,7 +4,7 @@
 
 import WebRTC
 
-public struct DataChannelConfiguration: Hashable, Sendable {
+public struct DataChannelConfiguration: Hashable, Codable, Sendable {
     /** Set to true if ordered delivery is required. */
     public var isOrdered: Bool
 

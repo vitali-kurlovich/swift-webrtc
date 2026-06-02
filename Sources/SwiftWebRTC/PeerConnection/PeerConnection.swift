@@ -2,6 +2,7 @@
 //  Created by Kurlovich Vitali on 5/26/26.
 //
 
+import Logging
 import Observation
 import WebRTC
 
@@ -11,8 +12,7 @@ public enum PeerConnectionError: Error {
 }
 
 @Observable
-@MainActor
-public final class PeerConnection {
+public final class PeerConnection: @unchecked Sendable {
     private let factory: RTCPeerConnectionFactory
     private let configuration: RTCConfiguration
 
@@ -72,6 +72,17 @@ public extension PeerConnection {
 }
 
 public extension PeerConnection {
+    var logger: Logger? {
+        get {
+            connectionDelegate.logger
+        }
+        set {
+            connectionDelegate.logger = newValue
+        }
+    }
+}
+
+public extension PeerConnection {
     var localStreams: [RTCMediaStream] {
         peerConnection.localStreams
     }
@@ -98,12 +109,17 @@ public extension PeerConnection {
 public extension PeerConnection {
     /** Create a new data channel with the given label and configuration. */
     func channel(label: String, with configuration: DataChannelConfiguration = .init()) throws -> DataChannel {
+        logger?.info("\(String(describing: Self.self)) channel")
+
         guard let channel = peerConnection.dataChannel(forLabel: label, configuration: .init(configuration)) else {
-            // debugPrint("Warning: Couldn't create data channel.")
-            throw PeerConnectionError.cantCreateNewDataChannel
+            let error = PeerConnectionError.cantCreateNewDataChannel
+            logger?.error("\(String(describing: Self.self)) \(error.localizedDescription)", error: error)
+            throw error
         }
 
-        return DataChannel(channel)
+        let dataChanel = DataChannel(channel)
+        dataChanel.logger = logger
+        return dataChanel
     }
 }
 
@@ -111,40 +127,81 @@ public extension PeerConnection {
     // MARK: Signaling
 
     func offer(_ options: PeerMediaOption = [.offerToReceiveAudio, .offerToReceiveVideo]) async throws -> SessionDescription {
-        let mediaConstrains = RTCMediaConstraints(mandatoryConstraints: options.dict, optionalConstraints: nil)
-        let description = try await peerConnection.offer(for: mediaConstrains)
-        try await peerConnection.setLocalDescription(description)
-        return .init(description)
+        do {
+            logger?.info("\(String(describing: Self.self)) offer")
+            logger?.debug("options: \(options)")
+
+            let mediaConstrains = RTCMediaConstraints(mandatoryConstraints: options.dict, optionalConstraints: nil)
+            let description = try await peerConnection.offer(for: mediaConstrains)
+
+            logger?.debug("\(String(describing: Self.self)) \(description.description)")
+
+            try await peerConnection.setLocalDescription(description)
+            return .init(description)
+        } catch {
+            logger?.error("\(String(describing: Self.self)) \(error.localizedDescription)", error: error)
+            throw error
+        }
     }
 
     func answer(_ options: PeerMediaOption = [.offerToReceiveAudio, .offerToReceiveVideo]) async throws -> SessionDescription {
-        let mediaConstrains = RTCMediaConstraints(mandatoryConstraints: options.dict, optionalConstraints: nil)
-        let description = try await peerConnection.answer(for: mediaConstrains)
-        try await peerConnection.setLocalDescription(description)
-        return .init(description)
+        do {
+            logger?.info("\(String(describing: Self.self)) answer")
+            logger?.debug("options: \(options)")
+
+            let mediaConstrains = RTCMediaConstraints(mandatoryConstraints: options.dict, optionalConstraints: nil)
+            let description = try await peerConnection.answer(for: mediaConstrains)
+
+            logger?.debug("\(String(describing: Self.self)) \(description.description)")
+
+            try await peerConnection.setLocalDescription(description)
+            return .init(description)
+        } catch {
+            logger?.error("\(String(describing: Self.self)) \(error.localizedDescription)", error: error)
+            throw error
+        }
     }
 }
 
 public extension PeerConnection {
     /** Terminate all media and close the transport. */
     func close() {
+        logger?.info("\(String(describing: Self.self)) close")
         peerConnection.close()
     }
 }
 
 public extension PeerConnection {
     func setRemoteDescription(_ description: SessionDescription) async throws {
-        try await peerConnection.setRemoteDescription(.init(description))
+        do {
+            logger?.info("\(String(describing: Self.self)) setRemoteDescription:")
+            logger?.debug("description: \(description)")
+            try await peerConnection.setRemoteDescription(.init(description))
+        } catch {
+            logger?.error("\(String(describing: Self.self)) \(error.localizedDescription)", error: error)
+            throw error
+        }
     }
 }
 
 public extension PeerConnection {
     func add(_ candidate: IceCandidate) async throws {
-        try await peerConnection.add(.init(candidate))
+        do {
+            logger?.info("\(String(describing: Self.self)) add candidate")
+            logger?.debug("candidate: \(candidate)")
+            try await peerConnection.add(.init(candidate))
+        } catch {
+            logger?.error("\(String(describing: Self.self)) \(error.localizedDescription)", error: error)
+            throw error
+        }
     }
 
     func remove(_ candidates: [IceCandidate]) {
         let candidates = candidates.map { RTCIceCandidate($0) }
+
+        logger?.info("\(String(describing: Self.self)) remove candidates")
+        logger?.debug("candidates: \(candidates)")
+
         peerConnection.remove(candidates)
     }
 }
