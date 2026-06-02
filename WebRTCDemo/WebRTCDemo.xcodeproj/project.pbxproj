@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		5403284C2FC9D50E0054F97D /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = 5403284B2FC9D50E0054F97D /* Configuration */; };
 		540328782FCB46D20054F97D /* SwiftUIComponents in Frameworks */ = {isa = PBXBuildFile; productRef = 540328772FCB46D20054F97D /* SwiftUIComponents */; };
+		54B238F92FCE21EC0002CCA6 /* InMemoryLogging in Frameworks */ = {isa = PBXBuildFile; productRef = 54B238F82FCE21EC0002CCA6 /* InMemoryLogging */; };
 		54B2A56B2FCCBC51008CFF73 /* SwiftWebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 54B2A56A2FCCBC51008CFF73 /* SwiftWebRTC */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +31,7 @@
 			files = (
 				5403284C2FC9D50E0054F97D /* Configuration in Frameworks */,
 				54B2A56B2FCCBC51008CFF73 /* SwiftWebRTC in Frameworks */,
+				54B238F92FCE21EC0002CCA6 /* InMemoryLogging in Frameworks */,
 				540328782FCB46D20054F97D /* SwiftUIComponents in Frameworks */,
 			);
 		};
@@ -73,6 +75,7 @@
 				5403284B2FC9D50E0054F97D /* Configuration */,
 				540328772FCB46D20054F97D /* SwiftUIComponents */,
 				54B2A56A2FCCBC51008CFF73 /* SwiftWebRTC */,
+				54B238F82FCE21EC0002CCA6 /* InMemoryLogging */,
 			);
 			productName = WebRTCDemo;
 			productReference = 54C16AE42FC2286C00497849 /* WebRTCDemo.app */;
@@ -106,6 +109,7 @@
 				5403284A2FC9D50E0054F97D /* XCRemoteSwiftPackageReference "swift-configuration" */,
 				540328762FCB46D20054F97D /* XCRemoteSwiftPackageReference "swift-ui" */,
 				54B2A5692FCCBC51008CFF73 /* XCLocalSwiftPackageReference "../../swift-webrtc" */,
+				54B238F72FCE21EC0002CCA6 /* XCRemoteSwiftPackageReference "swift-log" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 54C16AE52FC2286C00497849 /* Products */;
@@ -410,6 +414,14 @@
 				minimumVersion = 0.0.5;
 			};
 		};
+		54B238F72FCE21EC0002CCA6 /* XCRemoteSwiftPackageReference "swift-log" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-log";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.13.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -422,6 +434,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 540328762FCB46D20054F97D /* XCRemoteSwiftPackageReference "swift-ui" */;
 			productName = SwiftUIComponents;
+		};
+		54B238F82FCE21EC0002CCA6 /* InMemoryLogging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 54B238F72FCE21EC0002CCA6 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = InMemoryLogging;
 		};
 		54B2A56A2FCCBC51008CFF73 /* SwiftWebRTC */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -2,13 +2,15 @@
 //  Created by Kurlovich Vitali on 6/1/26.
 //
 
+import Foundation
+import InMemoryLogging
 import Logging
-import Observation
 
 final class LoggingBootstrap {
     private var isBootstrapped: Bool
 
-    let inMemoryStorage = InMemoryLogEventsStorage()
+    let inMemoryHandler = InMemoryLogHandler()
+    private let observationLogHandler = ObservationLogHandler()
 
     private init() {
         isBootstrapped = false
@@ -20,20 +22,29 @@ extension LoggingBootstrap {
 }
 
 extension LoggingBootstrap {
+    func events() -> some AsyncSequence<LogEvent, Never> {
+        observationLogHandler.events()
+    }
+}
+
+extension LoggingBootstrap {
     func bootstrap() {
         guard isBootstrapped == false else {
             return
         }
 
-        LoggingSystem.bootstrap { [inMemoryStorage] label in
+        LoggingSystem.bootstrap { [inMemoryHandler, observationLogHandler] label in
             var consoleHandler = StreamLogHandler.standardOutput(label: label)
             consoleHandler.logLevel = .debug
 
-            let inMemory = InMemoryLogging(storage: inMemoryStorage, metadata: .init(), logLevel: .info)
+            let subsystem = Bundle.main.bundleIdentifier ?? ""
+
+            let osLogHandler = OSLogHandler(subsystem: subsystem, metadata: .init(), logLevel: .debug)
 
             return MultiplexLogHandler([
-                consoleHandler,
-                inMemory,
+                osLogHandler,
+                inMemoryHandler,
+                observationLogHandler,
             ])
         }
 
