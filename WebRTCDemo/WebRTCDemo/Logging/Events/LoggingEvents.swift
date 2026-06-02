@@ -23,4 +23,14 @@ extension LoggingEvents {
     var system: Logger {
         Logger(label: "system")
     }
+
+    @inlinable
+    var webrct: Logger {
+        Logger(label: "WebRCT")
+    }
+
+    @inlinable
+    var configuration: Logger {
+        Logger(label: "WebRCT")
+    }
 }

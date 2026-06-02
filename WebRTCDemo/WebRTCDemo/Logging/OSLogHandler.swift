@@ -5,7 +5,7 @@
 import Logging
 import OSLog
 
-struct OSLogHandler: @preconcurrency LogHandler {
+struct OSLogHandler: LogHandler {
     let label: String
     let subsystem: String
 
@@ -22,15 +22,17 @@ struct OSLogHandler: @preconcurrency LogHandler {
         }
     }
 
-    @MainActor func log(event: LogEvent) {
+    func log(event: LogEvent) {
         let logger = Logger(subsystem: subsystem, category: label)
 
-        logger.log(level: .init(event.level), "\(event.message.description)")
+        let level = OSLogType(event.level)
+
+        logger.log(level: level, "\(event.message.description)")
     }
 }
 
 extension OSLogType {
-    init(_ type: Logging.Logger.Level) {
+    nonisolated init(_ type: Logging.Logger.Level) {
         switch type {
         case .trace:
             self = .debug
