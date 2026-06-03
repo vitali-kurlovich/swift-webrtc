@@ -6,7 +6,7 @@ import Logging
 import WebRTC
 
 final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Sendable {
-    unowned var channel: DataChannel!
+    // unowned var channel: DataChannel!
 
     let messageUpdates: AsyncStream<DataMessage>
     let messageUpdatesContinuation: AsyncStream<DataMessage>.Continuation
@@ -16,6 +16,12 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Se
 
     let events: AsyncStream<DataChannelEvent>
     let eventsContinuation: AsyncStream<DataChannelEvent>.Continuation
+
+    deinit {
+        messageUpdatesContinuation.finish()
+        stateContinuation.finish()
+        eventsContinuation.finish()
+    }
 
     override init() {
         let (messageUpdates, messageUpdatesContinuation) = AsyncStream.makeStream(of: DataMessage.self)
@@ -37,8 +43,6 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Se
 
     /** The data channel state changed. */
     func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {
-        assert(channel.channel === dataChannel)
-
         let state = DataChannelState(dataChannel.readyState)
 
         logger?.debug("RTCDataChannelDelegate dataChannelDidChangeState: \(state)")
@@ -49,7 +53,6 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Se
 
     /** The data channel successfully received a data buffer. */
     func dataChannel(_ dataChannel: RTCDataChannel, didReceiveMessageWith buffer: RTCDataBuffer) {
-        assert(channel.channel === dataChannel)
         logger?.debug("RTCDataChannelDelegate didReceiveMessageWith: \(buffer.description)")
 
         let buffer = DataBuffer(data: buffer.data, isBinry: buffer.isBinary)
@@ -60,8 +63,7 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Se
     }
 
     /** The data channel's `bufferedAmount` changed. */
-    func dataChannel(_ dataChannel: RTCDataChannel, didChangeBufferedAmount amount: UInt64) {
-        assert(channel.channel === dataChannel)
+    func dataChannel(_: RTCDataChannel, didChangeBufferedAmount amount: UInt64) {
         logger?.debug("RTCDataChannelDelegate didChangeBufferedAmount: \(amount)")
 
         eventsContinuation.yield(.changeBufferedAmount)

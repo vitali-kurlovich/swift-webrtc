@@ -12,8 +12,13 @@ public actor DataChannelHistory {
     public private(set) var history: [HistoryDataItem]
 
     public let itemsUpdate: AsyncStream<HistoryDataItem>
+    private let itemsContinuation: AsyncStream<HistoryDataItem>.Continuation
 
     private var messagesTask: Task<Void, Never>?
+
+    deinit {
+        itemsContinuation.finish()
+    }
 
     public init(channel: DataChannel, logger: Logger? = nil) {
         self.logger = logger
@@ -24,8 +29,6 @@ public actor DataChannelHistory {
         itemsUpdate = stream
         itemsContinuation = continuation
     }
-
-    private let itemsContinuation: AsyncStream<HistoryDataItem>.Continuation
 }
 
 public extension DataChannelHistory {

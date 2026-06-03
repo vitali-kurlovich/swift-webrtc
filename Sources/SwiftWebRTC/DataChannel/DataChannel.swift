@@ -13,7 +13,6 @@ public final class DataChannel: @unchecked Sendable {
         self.channel = channel
         channelDelegate = DataChannelDelegate()
 
-        channelDelegate.channel = self
         channel.delegate = channelDelegate
     }
 }
@@ -40,34 +39,6 @@ public extension DataChannel {
 
     var events: AsyncStream<DataChannelEvent> {
         channelDelegate.events
-    }
-}
-
-public extension DataChannel {
-    /** Attempt to send `buffer` on this data channel's underlying data transport. */
-    func send(_ buffer: DataBuffer) -> Bool {
-        logger?.info("\(String(describing: Self.self)) send")
-        logger?.debug("buffer \(buffer)")
-
-        let buffer = RTCDataBuffer(data: buffer.data, isBinary: buffer.isBinry)
-
-        if channel.sendData(buffer) {
-            let dataBuffer = DataBuffer(buffer)
-            let message = DataMessage(channelId: channelId, type: .outcoming, buffer: dataBuffer)
-
-            messageUpdatesContinuation.yield(message)
-            eventsContinuation.yield(.sendMessage)
-
-            return true
-        }
-        return false
-    }
-
-    /** Closes the data channel. */
-    func close() {
-        logger?.info("\(String(describing: Self.self)) close")
-        channel.close()
-        eventsContinuation.yield(.close)
     }
 }
 
@@ -123,6 +94,34 @@ public extension DataChannel {
      */
     var bufferedAmount: UInt64 {
         channel.bufferedAmount
+    }
+}
+
+public extension DataChannel {
+    /** Attempt to send `buffer` on this data channel's underlying data transport. */
+    func send(_ buffer: DataBuffer) -> Bool {
+        logger?.info("\(String(describing: Self.self)) send")
+        logger?.debug("buffer \(buffer)")
+
+        let buffer = RTCDataBuffer(data: buffer.data, isBinary: buffer.isBinry)
+
+        if channel.sendData(buffer) {
+            let dataBuffer = DataBuffer(buffer)
+            let message = DataMessage(channelId: channelId, type: .outcoming, buffer: dataBuffer)
+
+            messageUpdatesContinuation.yield(message)
+            eventsContinuation.yield(.sendMessage)
+
+            return true
+        }
+        return false
+    }
+
+    /** Closes the data channel. */
+    func close() {
+        logger?.info("\(String(describing: Self.self)) close")
+        channel.close()
+        eventsContinuation.yield(.close)
     }
 }
 

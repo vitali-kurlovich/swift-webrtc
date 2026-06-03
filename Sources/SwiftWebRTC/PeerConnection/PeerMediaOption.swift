@@ -27,6 +27,13 @@ public struct PeerMediaOption: OptionSet, Hashable, Codable, Sendable {
     public static var voiceActivityDetection: Self {
         .init(rawValue: 1 << 3)
     }
+
+    /// Define media constraints. DtlsSrtpKeyAgreement is required to be true to be able to connect with web browsers.
+    public static var tlsSrtp: Self {
+        .init(rawValue: 1 << 4)
+    }
+
+    //
 }
 
 extension PeerMediaOption {
@@ -50,6 +57,10 @@ extension PeerMediaOption {
 
         if contains(.voiceActivityDetection) {
             result[kRTCMediaConstraintsVoiceActivityDetection] = kRTCMediaConstraintsValueTrue
+        }
+
+        if contains(.tlsSrtp) {
+            result["DtlsSrtpKeyAgreement"] = kRTCMediaConstraintsValueTrue
         }
 
         return result

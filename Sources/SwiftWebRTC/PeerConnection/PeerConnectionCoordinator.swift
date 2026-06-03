@@ -3,14 +3,12 @@
 //
 
 import Logging
-import Observation
 
-@Observable
-public final class PeerConnectionCoordinator<Provider: SignalProvider>: @unchecked Sendable {
+public final class PeerConnectionCoordinator: @unchecked Sendable {
     public var logger: Logger?
 
     public let connection: PeerConnection
-    public let signalProvider: Provider
+    public let signalProvider: any SignalProvider
 
     private var eventsTask: Task<Void, Never>?
     private var sessionsTask: Task<Void, Never>?
@@ -18,7 +16,7 @@ public final class PeerConnectionCoordinator<Provider: SignalProvider>: @uncheck
 
     public private(set) var channels: [DataChannel] = []
 
-    public init(connection: PeerConnection, signalProvider: Provider, logger: Logger? = nil) {
+    public init(connection: PeerConnection, signalProvider: any SignalProvider, logger: Logger? = nil) {
         self.connection = connection
         self.signalProvider = signalProvider
         self.logger = logger
@@ -127,12 +125,24 @@ private extension PeerConnectionCoordinator {
 private extension PeerConnectionCoordinator {
     func update(event: PeerConnectionEvent) {
         switch event {
+        // -------- State --------
+        case let .changeConnectionState(state):
+            logger?.debug("\(String(describing: Self.self)) changeConnectionState: \(state)")
+        case let .changeSignalingState(state):
+            logger?.debug("\(String(describing: Self.self)) changeSignalingState: \(state)")
+        case let .changeIceConnectionState(state):
+            logger?.debug("\(String(describing: Self.self)) changeIceConnectionState: \(state)")
+        case let .changeIceGatheringState(state):
+            logger?.debug("\(String(describing: Self.self)) changeIceGatheringState: \(state)")
+        // -------- Media --------
         case .addMediaStream:
             logger?.debug("\(String(describing: Self.self)) addMediaStream")
         case .removeMediaStream:
             logger?.debug("\(String(describing: Self.self)) removeMediaStream")
+        // -------- Negotiate --------
         case .shouldNegotiate:
             logger?.debug("\(String(describing: Self.self)) shouldNegotiate")
+        // -------- Candidate --------
         case let .generateCandidate(candidate):
             logger?.debug("\(String(describing: Self.self)) generateCandidate \(candidate)")
             Task {
@@ -140,6 +150,7 @@ private extension PeerConnectionCoordinator {
             }
         case .removeCandidateas:
             logger?.debug("\(String(describing: Self.self)) removeCandidateas")
+        // -------- Channel --------
         case let .openChannel(channel):
             logger?.debug("\(String(describing: Self.self)) openChannel \(channel)")
             channels.append(channel)

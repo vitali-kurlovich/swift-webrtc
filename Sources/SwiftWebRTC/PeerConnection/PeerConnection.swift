@@ -3,7 +3,6 @@
 //
 
 import Logging
-import Observation
 import WebRTC
 
 public enum PeerConnectionError: Error {
@@ -11,18 +10,6 @@ public enum PeerConnectionError: Error {
     case cantCreateNewDataChannel
 }
 
-public enum PeerConnectionEvent {
-    case addMediaStream
-    case removeMediaStream
-
-    case shouldNegotiate
-    case generateCandidate(IceCandidate)
-    case removeCandidateas([IceCandidate])
-
-    case openChannel(DataChannel)
-}
-
-@Observable
 public final class PeerConnection: @unchecked Sendable {
     private let factory: RTCPeerConnectionFactory
     private let configuration: RTCConfiguration
@@ -30,21 +17,18 @@ public final class PeerConnection: @unchecked Sendable {
     let peerConnection: RTCPeerConnection
     private let connectionDelegate: PeerConnectionDelegate
 
-    public internal(set) var connectionState: PeerConnectionState
-    public internal(set) var signalingState: SignalingState
-    public internal(set) var iceConnectionState: IceConnectionState
-    public internal(set) var iceGatheringState: IceGatheringState
-
-    public init(factory: RTCPeerConnectionFactory, configuration: RTCConfiguration) throws {
+    public init(factory: RTCPeerConnectionFactory,
+                configuration: RTCConfiguration,
+                optional: PeerMediaOption = [.tlsSrtp],
+                logger: Logger? = nil) throws
+    {
         self.factory = factory
         self.configuration = configuration
 
-        // Define media constraints. DtlsSrtpKeyAgreement is required to be true to be able to connect with web browsers.
         let constraints = RTCMediaConstraints(mandatoryConstraints: nil,
-                                              optionalConstraints: ["DtlsSrtpKeyAgreement": kRTCMediaConstraintsValueTrue])
+                                              optionalConstraints: optional.dict)
 
         let connectionDelegate = PeerConnectionDelegate()
-
         self.connectionDelegate = connectionDelegate
 
         guard let connection = factory.peerConnection(with: configuration, constraints: constraints, delegate: connectionDelegate) else {
@@ -53,13 +37,25 @@ public final class PeerConnection: @unchecked Sendable {
 
         peerConnection = connection
 
-        signalingState = .init(connection.signalingState)
-        iceConnectionState = .init(connection.iceConnectionState)
-        connectionState = .init(connection.connectionState)
-        iceGatheringState = .init(connection.iceGatheringState)
+        self.logger = logger
+    }
+}
 
-        connectionDelegate.connection = self
-        peerConnection.delegate = connectionDelegate
+public extension PeerConnection {
+    var connectionState: PeerConnectionState {
+        .init(peerConnection.connectionState)
+    }
+
+    var signalingState: SignalingState {
+        .init(peerConnection.signalingState)
+    }
+
+    var iceConnectionState: IceConnectionState {
+        .init(peerConnection.iceConnectionState)
+    }
+
+    var iceGatheringState: IceGatheringState {
+        .init(peerConnection.iceGatheringState)
     }
 }
 

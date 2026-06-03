@@ -6,88 +6,85 @@ import Logging
 import WebRTC
 
 final class PeerConnectionDelegate: NSObject, RTCPeerConnectionDelegate, @unchecked Sendable {
-    unowned var connection: PeerConnection!
-
     var logger: Logger?
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCPeerConnectionState) {
-        assert(connection.peerConnection === peerConnection)
-        logger?.debug("RTCPeerConnectionDelegate didChange newState: \(newState)")
+    let events: AsyncStream<PeerConnectionEvent>
+    private let continuation: AsyncStream<PeerConnectionEvent>.Continuation
 
-        connection?.connectionState = .init(newState)
+    deinit {
+        continuation.finish()
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didChange stateChanged: RTCSignalingState) {
-        assert(connection.peerConnection === peerConnection)
-        logger?.debug("RTCPeerConnectionDelegate didChange stateChanged: \(stateChanged)")
+    override init() {
+        let (events, continuation) = AsyncStream.makeStream(of: PeerConnectionEvent.self)
+        self.events = events
+        self.continuation = continuation
 
-        connection?.signalingState = .init(stateChanged)
+        super.init()
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceConnectionState) {
-        assert(connection.peerConnection === peerConnection)
-        logger?.debug("RTCPeerConnectionDelegate didChange newState: \(newState)")
-
-        connection?.iceConnectionState = .init(newState)
+    func peerConnection(_: RTCPeerConnection, didChange newState: RTCPeerConnectionState) {
+        let newState = PeerConnectionState(newState)
+        logger?.debug("RTCPeerConnectionDelegate changeConnectionState: \(newState)")
+        continuation.yield(.changeConnectionState(newState))
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceGatheringState) {
-        assert(connection.peerConnection === peerConnection)
-        logger?.debug("RTCPeerConnectionDelegate didChange newState: \(newState)")
-
-        connection?.iceGatheringState = .init(newState)
+    func peerConnection(_: RTCPeerConnection, didChange newState: RTCSignalingState) {
+        let newState = SignalingState(newState)
+        logger?.debug("RTCPeerConnectionDelegate changeSignalingState: \(newState)")
+        continuation.yield(.changeSignalingState(newState))
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didAdd mediaStream: RTCMediaStream) {
-        assert(connection.peerConnection === peerConnection)
+    func peerConnection(_: RTCPeerConnection, didChange newState: RTCIceConnectionState) {
+        let newState = IceConnectionState(newState)
+        logger?.debug("RTCPeerConnectionDelegate changeIceConnectionState: \(newState)")
+        continuation.yield(.changeIceConnectionState(newState))
+    }
+
+    func peerConnection(_: RTCPeerConnection, didChange newState: RTCIceGatheringState) {
+        let newState = IceGatheringState(newState)
+        logger?.debug("RTCPeerConnectionDelegate changeIceGatheringState: \(newState)")
+        continuation.yield(.changeIceGatheringState(newState))
+    }
+
+    func peerConnection(_: RTCPeerConnection, didAdd mediaStream: RTCMediaStream) {
         logger?.debug("RTCPeerConnectionDelegate didAdd mediaStream: \(mediaStream.description)")
 
         // TODO:
-        continuation?.yield(.addMediaStream)
+        continuation.yield(.addMediaStream)
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didRemove mediaStream: RTCMediaStream) {
-        assert(connection.peerConnection === peerConnection)
+    func peerConnection(_: RTCPeerConnection, didRemove mediaStream: RTCMediaStream) {
         logger?.debug("RTCPeerConnectionDelegate didRemove mediaStream: \(mediaStream.description)")
 
         // TODO:
-        continuation?.yield(.removeMediaStream)
+        continuation.yield(.removeMediaStream)
     }
 
-    func peerConnectionShouldNegotiate(_ peerConnection: RTCPeerConnection) {
-        assert(connection.peerConnection === peerConnection)
+    func peerConnectionShouldNegotiate(_: RTCPeerConnection) {
         logger?.debug("RTCPeerConnectionDelegate peerConnectionShouldNegotiate")
 
-        continuation?.yield(.shouldNegotiate)
+        continuation.yield(.shouldNegotiate)
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate candidate: RTCIceCandidate) {
-        assert(connection.peerConnection === peerConnection)
+    func peerConnection(_: RTCPeerConnection, didGenerate candidate: RTCIceCandidate) {
         logger?.debug("RTCPeerConnectionDelegate didGenerate candidate: \(candidate.description)")
 
         let candidate = IceCandidate(candidate)
-        continuation?.yield(.generateCandidate(candidate))
+        continuation.yield(.generateCandidate(candidate))
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didRemove candidates: [RTCIceCandidate]) {
-        assert(connection.peerConnection === peerConnection)
+    func peerConnection(_: RTCPeerConnection, didRemove candidates: [RTCIceCandidate]) {
         logger?.debug("RTCPeerConnectionDelegate didRemove candidates: \(candidates.description)")
 
         let candidates = candidates.map { IceCandidate($0) }
-        continuation?.yield(.removeCandidateas(candidates))
+        continuation.yield(.removeCandidateas(candidates))
     }
 
-    func peerConnection(_ peerConnection: RTCPeerConnection, didOpen channel: RTCDataChannel) {
-        assert(connection.peerConnection === peerConnection)
+    func peerConnection(_: RTCPeerConnection, didOpen channel: RTCDataChannel) {
         logger?.debug("RTCPeerConnectionDelegate didOpen channel: \(channel.description)")
 
         let channel = DataChannel(channel)
-        continuation?.yield(.openChannel(channel))
+        continuation.yield(.openChannel(channel))
     }
-
-    private(set) lazy var events: AsyncStream<PeerConnectionEvent> = AsyncStream { (continuation: AsyncStream<PeerConnectionEvent>.Continuation) in
-        self.continuation = continuation
-    }
-
-    private var continuation: AsyncStream<PeerConnectionEvent>.Continuation?
 }
