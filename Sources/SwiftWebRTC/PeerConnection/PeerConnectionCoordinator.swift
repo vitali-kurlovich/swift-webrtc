@@ -3,7 +3,9 @@
 //
 
 import Logging
+import Observation
 
+@Observable
 public final class PeerConnectionCoordinator<Provider: SignalProvider>: @unchecked Sendable {
     public var logger: Logger?
 
@@ -13,6 +15,8 @@ public final class PeerConnectionCoordinator<Provider: SignalProvider>: @uncheck
     private var eventsTask: Task<Void, Never>?
     private var sessionsTask: Task<Void, Never>?
     private var candidatesTask: Task<Void, Never>?
+
+    public private(set) var channels: [DataChannel] = []
 
     public init(connection: PeerConnection, signalProvider: Provider, logger: Logger? = nil) {
         self.connection = connection
@@ -48,6 +52,19 @@ public extension PeerConnectionCoordinator {
 
             logger?.info("\(String(describing: Self.self)) signalProvider.send session")
             try await signalProvider.send(session: session)
+        } catch {
+            logger?.error("\(String(describing: Self.self)) \(error)", error: error)
+            throw error
+        }
+    }
+
+    func newChannel(label: String) throws -> DataChannel {
+        do {
+            logger?.info("\(String(describing: Self.self)) channel label:\(label)")
+            let channel = try connection.channel(label: label)
+            channels.append(channel)
+            return channel
+
         } catch {
             logger?.error("\(String(describing: Self.self)) \(error)", error: error)
             throw error
@@ -123,8 +140,9 @@ private extension PeerConnectionCoordinator {
             }
         case .removeCandidateas:
             logger?.debug("\(String(describing: Self.self)) removeCandidateas")
-        case .openChannel:
-            logger?.debug("\(String(describing: Self.self)) openChannel")
+        case let .openChannel(channel):
+            logger?.debug("\(String(describing: Self.self)) openChannel \(channel)")
+            channels.append(channel)
         }
     }
 }
