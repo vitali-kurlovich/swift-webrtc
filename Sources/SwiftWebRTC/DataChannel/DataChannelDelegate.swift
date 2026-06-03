@@ -26,10 +26,9 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Se
         logger?.debug("RTCDataChannelDelegate didReceiveMessageWith: \(buffer.description)")
 
         let buffer = DataBuffer(data: buffer.data, isBinry: buffer.isBinary)
+        let message = DataMessage(channelId: dataChannel.channelId, source: .remote, buffer: buffer)
 
-        // TODO: use NotificationCenter for `messages`
-
-        continuation?.yield(buffer)
+        continuation?.yield(message)
     }
 
     /** The data channel's `bufferedAmount` changed. */
@@ -38,9 +37,9 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Se
         logger?.debug("RTCDataChannelDelegate didChangeBufferedAmount: \(amount)")
     }
 
-    private(set) lazy var messages: AsyncStream<DataBuffer> = AsyncStream { (continuation: AsyncStream<DataBuffer>.Continuation) in
+    private(set) lazy var messages: AsyncStream<DataMessage> = AsyncStream { (continuation: AsyncStream<DataMessage>.Continuation) in
         self.continuation = continuation
     }
 
-    private var continuation: AsyncStream<DataBuffer>.Continuation?
+    var continuation: AsyncStream<DataMessage>.Continuation?
 }

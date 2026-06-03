@@ -36,7 +36,7 @@ public extension DataChannel {
 }
 
 public extension DataChannel {
-    var messages: AsyncStream<DataBuffer> {
+    var messages: AsyncStream<DataMessage> {
         channelDelegate.messages
     }
 }
@@ -49,7 +49,13 @@ public extension DataChannel {
 
         let buffer = RTCDataBuffer(data: buffer.data, isBinary: buffer.isBinry)
 
-        return channel.sendData(buffer)
+        if channel.sendData(buffer) {
+            let dataBuffer = DataBuffer(buffer)
+            let message = DataMessage(channelId: channelId, source: .local, buffer: dataBuffer)
+            continuation?.yield(message)
+            return true
+        }
+        return false
     }
 
     /** Closes the data channel. */
@@ -106,5 +112,11 @@ public extension DataChannel {
      */
     var bufferedAmount: UInt64 {
         channel.bufferedAmount
+    }
+}
+
+private extension DataChannel {
+    var continuation: AsyncStream<DataMessage>.Continuation? {
+        channelDelegate.continuation
     }
 }
