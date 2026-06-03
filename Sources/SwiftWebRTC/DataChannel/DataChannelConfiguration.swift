@@ -8,12 +8,6 @@ public struct DataChannelConfiguration: Hashable, Codable, Sendable {
     /** Set to true if ordered delivery is required. */
     public var isOrdered: Bool
 
-    /**
-     * Max period in milliseconds in which retransmissions will be sent. After this
-     * time, no more retransmissions will be sent. -1 if unset.
-     */
-    public var maxPacketLifeTime: Int32
-
     /** The max number of retransmissions. -1 if unset. */
     public var maxRetransmits: Int32
 
@@ -25,9 +19,12 @@ public struct DataChannelConfiguration: Hashable, Codable, Sendable {
     /** The id of the data channel. */
     public var channelId: Int32
 
-    public init(isOrdered: Bool, maxPacketLifeTime: Int32, maxRetransmits: Int32, isNegotiated: Bool, channelId: Int32) {
+    public init(isOrdered: Bool,
+                maxRetransmits: Int32,
+                isNegotiated: Bool,
+                channelId: Int32)
+    {
         self.isOrdered = isOrdered
-        self.maxPacketLifeTime = maxPacketLifeTime
         self.maxRetransmits = maxRetransmits
         self.isNegotiated = isNegotiated
         self.channelId = channelId
@@ -42,7 +39,6 @@ extension DataChannelConfiguration {
 
     init(_ config: RTCDataChannelConfiguration) {
         self.init(isOrdered: config.isOrdered,
-                  maxPacketLifeTime: config.maxPacketLifeTime,
                   maxRetransmits: config.maxRetransmits,
                   isNegotiated: config.isNegotiated,
                   channelId: config.channelId)
@@ -53,7 +49,6 @@ extension RTCDataChannelConfiguration {
     convenience init(_ config: DataChannelConfiguration) {
         self.init()
         isOrdered = config.isOrdered
-        maxPacketLifeTime = config.maxPacketLifeTime
         maxRetransmits = config.maxRetransmits
         isNegotiated = config.isNegotiated
         channelId = config.channelId
