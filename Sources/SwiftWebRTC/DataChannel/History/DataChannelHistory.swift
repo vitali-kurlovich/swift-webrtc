@@ -5,11 +5,13 @@
 import Logging
 import WebRTC
 
-public final class DataChannelHistory: @unchecked Sendable {
+public actor DataChannelHistory {
     public var logger: Logger?
 
     public let channel: DataChannel
     public private(set) var history: [HistoryDataItem]
+
+    public let itemsUpdate: AsyncStream<HistoryDataItem>
 
     private var messagesTask: Task<Void, Never>?
 
@@ -17,13 +19,19 @@ public final class DataChannelHistory: @unchecked Sendable {
         self.logger = logger
         self.channel = channel
         history = []
+
+        let (stream, continuation) = AsyncStream<HistoryDataItem>.makeStream(of: HistoryDataItem.self)
+        itemsUpdate = stream
+        itemsContinuation = continuation
     }
 
-    private(set) lazy var stateUpdates: AsyncStream<HistoryDataItem> = AsyncStream { (continuation: AsyncStream<HistoryDataItem>.Continuation) in
-        self.itemsContinuation = continuation
-    }
+    private let itemsContinuation: AsyncStream<HistoryDataItem>.Continuation
+}
 
-    private var itemsContinuation: AsyncStream<HistoryDataItem>.Continuation?
+public extension DataChannelHistory {
+    func clear() {
+        history.removeAll()
+    }
 }
 
 private extension DataChannelHistory {
@@ -38,7 +46,7 @@ private extension DataChannelHistory {
 
         history.append(item)
 
-        itemsContinuation?.yield(item)
+        itemsContinuation.yield(item)
     }
 }
 
@@ -46,7 +54,9 @@ private extension DataChannelHistory {
     func subscribeUpdates() {
         messagesTask = Task { [channel, weak self] in
             for await message in channel.messageUpdates {
-                self?.append(message)
+                if let self {
+                    await append(message)
+                }
             }
         }
     }

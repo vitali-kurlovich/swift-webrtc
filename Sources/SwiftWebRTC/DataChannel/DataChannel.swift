@@ -55,8 +55,8 @@ public extension DataChannel {
             let dataBuffer = DataBuffer(buffer)
             let message = DataMessage(channelId: channelId, type: .outcoming, buffer: dataBuffer)
 
-            messageUpdatesContinuation?.yield(message)
-            eventsContinuation?.yield(.sendMessage)
+            messageUpdatesContinuation.yield(message)
+            eventsContinuation.yield(.sendMessage)
 
             return true
         }
@@ -67,7 +67,7 @@ public extension DataChannel {
     func close() {
         logger?.info("\(String(describing: Self.self)) close")
         channel.close()
-        eventsContinuation?.yield(.close)
+        eventsContinuation.yield(.close)
     }
 }
 
@@ -127,11 +127,11 @@ public extension DataChannel {
 }
 
 private extension DataChannel {
-    var messageUpdatesContinuation: AsyncStream<DataMessage>.Continuation? {
+    var messageUpdatesContinuation: AsyncStream<DataMessage>.Continuation {
         channelDelegate.messageUpdatesContinuation
     }
 
-    var eventsContinuation: AsyncStream<DataChannelEvent>.Continuation? {
+    var eventsContinuation: AsyncStream<DataChannelEvent>.Continuation {
         channelDelegate.eventsContinuation
     }
 }

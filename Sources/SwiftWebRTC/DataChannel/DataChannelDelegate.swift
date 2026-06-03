@@ -8,6 +8,31 @@ import WebRTC
 final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Sendable {
     unowned var channel: DataChannel!
 
+    let messageUpdates: AsyncStream<DataMessage>
+    let messageUpdatesContinuation: AsyncStream<DataMessage>.Continuation
+
+    let stateUpdates: AsyncStream<DataChannelState>
+    private let stateContinuation: AsyncStream<DataChannelState>.Continuation
+
+    let events: AsyncStream<DataChannelEvent>
+    let eventsContinuation: AsyncStream<DataChannelEvent>.Continuation
+
+    override init() {
+        let (messageUpdates, messageUpdatesContinuation) = AsyncStream.makeStream(of: DataMessage.self)
+        self.messageUpdates = messageUpdates
+        self.messageUpdatesContinuation = messageUpdatesContinuation
+
+        let (stateUpdates, stateContinuation) = AsyncStream.makeStream(of: DataChannelState.self)
+        self.stateUpdates = stateUpdates
+        self.stateContinuation = stateContinuation
+
+        let (events, eventsContinuation) = AsyncStream.makeStream(of: DataChannelEvent.self)
+        self.events = events
+        self.eventsContinuation = eventsContinuation
+
+        super.init()
+    }
+
     var logger: Logger?
 
     /** The data channel state changed. */
@@ -18,8 +43,8 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Se
 
         logger?.debug("RTCDataChannelDelegate dataChannelDidChangeState: \(state)")
 
-        stateContinuation?.yield(state)
-        eventsContinuation?.yield(.statusChange)
+        stateContinuation.yield(state)
+        eventsContinuation.yield(.statusChange)
     }
 
     /** The data channel successfully received a data buffer. */
@@ -30,8 +55,8 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Se
         let buffer = DataBuffer(data: buffer.data, isBinry: buffer.isBinary)
         let message = DataMessage(channelId: dataChannel.channelId, type: .incoming, buffer: buffer)
 
-        messageUpdatesContinuation?.yield(message)
-        eventsContinuation?.yield(.receiveMessage)
+        messageUpdatesContinuation.yield(message)
+        eventsContinuation.yield(.receiveMessage)
     }
 
     /** The data channel's `bufferedAmount` changed. */
@@ -39,24 +64,6 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Se
         assert(channel.channel === dataChannel)
         logger?.debug("RTCDataChannelDelegate didChangeBufferedAmount: \(amount)")
 
-        eventsContinuation?.yield(.changeBufferedAmount)
+        eventsContinuation.yield(.changeBufferedAmount)
     }
-
-    private(set) lazy var messageUpdates: AsyncStream<DataMessage> = AsyncStream { (continuation: AsyncStream<DataMessage>.Continuation) in
-        self.messageUpdatesContinuation = continuation
-    }
-
-    private(set) var messageUpdatesContinuation: AsyncStream<DataMessage>.Continuation?
-
-    private(set) lazy var stateUpdates: AsyncStream<DataChannelState> = AsyncStream { (continuation: AsyncStream<DataChannelState>.Continuation) in
-        self.stateContinuation = continuation
-    }
-
-    private var stateContinuation: AsyncStream<DataChannelState>.Continuation?
-
-    private(set) lazy var events: AsyncStream<DataChannelEvent> = AsyncStream { (continuation: AsyncStream<DataChannelEvent>.Continuation) in
-        self.eventsContinuation = continuation
-    }
-
-    private(set) var eventsContinuation: AsyncStream<DataChannelEvent>.Continuation?
 }
