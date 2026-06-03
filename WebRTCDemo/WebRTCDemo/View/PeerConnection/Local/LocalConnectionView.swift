@@ -1,7 +1,4 @@
 //
-//  LocalConnectionView.swift
-//  WebRTCDemo
-//
 //  Created by Kurlovich Vitali on 6/3/26.
 //
 

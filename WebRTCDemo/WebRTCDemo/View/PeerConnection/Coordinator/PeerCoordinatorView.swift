@@ -23,9 +23,9 @@ struct NewChannelAlert: View {
     }
 }
 
-struct PeerCoordinatorView<Provider: SignalProvider>: View {
+struct PeerCoordinatorView: View {
     let title: String
-    let coordinator: PeerConnectionCoordinator<Provider>
+    let coordinator: PeerConnectionCoordinator
 
     @State
     private var isCreateChannelAlertPresented = false
