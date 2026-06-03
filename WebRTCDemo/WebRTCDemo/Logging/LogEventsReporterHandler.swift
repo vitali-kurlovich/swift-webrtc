@@ -10,6 +10,9 @@ public final class LogEventsReporterHandler: LogHandler, @unchecked Sendable {
     public var metadataProvider: Logger.MetadataProvider?
     public var logLevel: Logger.Level = .info
 
+    public let events: AsyncStream<LogEvent>
+    private let continuation: AsyncStream<LogEvent>.Continuation
+
     public init(
         metadata: Logger.Metadata = [:],
         metadataProvider: Logger.MetadataProvider? = nil,
@@ -18,10 +21,14 @@ public final class LogEventsReporterHandler: LogHandler, @unchecked Sendable {
         self.metadata = metadata
         self.metadataProvider = metadataProvider
         self.logLevel = logLevel
+
+        let (events, continuation) = AsyncStream.makeStream(of: LogEvent.self)
+        self.events = events
+        self.continuation = continuation
     }
 
     public func log(event: LogEvent) {
-        continuation?.yield(event)
+        continuation.yield(event)
     }
 
     public subscript(metadataKey key: String) -> Logger.Metadata.Value? {
@@ -32,10 +39,4 @@ public final class LogEventsReporterHandler: LogHandler, @unchecked Sendable {
             metadata[key] = newValue
         }
     }
-
-    public private(set) lazy var events: AsyncStream<LogEvent> = AsyncStream { (continuation: AsyncStream<LogEvent>.Continuation) in
-        self.continuation = continuation
-    }
-
-    private var continuation: AsyncStream<LogEvent>.Continuation?
 }

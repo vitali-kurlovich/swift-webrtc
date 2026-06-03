@@ -20,7 +20,7 @@ public actor DataChannelHistory {
         self.channel = channel
         history = []
 
-        let (stream, continuation) = AsyncStream<HistoryDataItem>.makeStream(of: HistoryDataItem.self)
+        let (stream, continuation) = AsyncStream.makeStream(of: HistoryDataItem.self)
         itemsUpdate = stream
         itemsContinuation = continuation
     }
