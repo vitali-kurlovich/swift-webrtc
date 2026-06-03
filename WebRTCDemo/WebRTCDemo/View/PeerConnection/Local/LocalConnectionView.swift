@@ -14,45 +14,9 @@ struct LocalConnectionView: View {
 
     var body: some View {
         HStack {
-            Form {
-                Section("Master") {
-                    PeerConnectionStatusInfo(connection: local.masterCoordinator.connection)
-                }
+            PeerCoordinatorView(title: "Master", coordinator: local.masterCoordinator)
 
-                Section {
-                    Button("Offer") {
-                        Task {
-                            try await local.masterCoordinator.offer()
-                        }
-                    }
-
-                    Button("Answer") {
-                        Task {
-                            try await local.masterCoordinator.answer()
-                        }
-                    }
-                }
-            }
-
-            Form {
-                Section("Secondary") {
-                    PeerConnectionStatusInfo(connection: local.secondaryCoordinator.connection)
-                }
-
-                Section {
-                    Button("Offer") {
-                        Task {
-                            try await local.secondaryCoordinator.offer()
-                        }
-                    }
-
-                    Button("Answer") {
-                        Task {
-                            try await local.secondaryCoordinator.answer()
-                        }
-                    }
-                }
-            }
+            PeerCoordinatorView(title: "Secondary", coordinator: local.secondaryCoordinator)
         }
     }
 }
