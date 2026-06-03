@@ -14,10 +14,12 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Se
     func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {
         assert(channel.channel === dataChannel)
 
-        let readyState = dataChannel.readyState
-        logger?.debug("RTCDataChannelDelegate dataChannelDidChangeState: \(readyState)")
+        let state = DataChannelState(dataChannel.readyState)
 
-        channel.readyState = DataChannelState(readyState)
+        logger?.debug("RTCDataChannelDelegate dataChannelDidChangeState: \(state)")
+
+        stateContinuation?.yield(state)
+        eventsContinuation?.yield(.statusChange)
     }
 
     /** The data channel successfully received a data buffer. */
@@ -28,18 +30,33 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Se
         let buffer = DataBuffer(data: buffer.data, isBinry: buffer.isBinary)
         let message = DataMessage(channelId: dataChannel.channelId, type: .incoming, buffer: buffer)
 
-        continuation?.yield(message)
+        messageUpdatesContinuation?.yield(message)
+        eventsContinuation?.yield(.receiveMessage)
     }
 
     /** The data channel's `bufferedAmount` changed. */
     func dataChannel(_ dataChannel: RTCDataChannel, didChangeBufferedAmount amount: UInt64) {
         assert(channel.channel === dataChannel)
         logger?.debug("RTCDataChannelDelegate didChangeBufferedAmount: \(amount)")
+
+        eventsContinuation?.yield(.changeBufferedAmount)
     }
 
-    private(set) lazy var messages: AsyncStream<DataMessage> = AsyncStream { (continuation: AsyncStream<DataMessage>.Continuation) in
-        self.continuation = continuation
+    private(set) lazy var messageUpdates: AsyncStream<DataMessage> = AsyncStream { (continuation: AsyncStream<DataMessage>.Continuation) in
+        self.messageUpdatesContinuation = continuation
     }
 
-    var continuation: AsyncStream<DataMessage>.Continuation?
+    private(set) var messageUpdatesContinuation: AsyncStream<DataMessage>.Continuation?
+
+    private(set) lazy var stateUpdates: AsyncStream<DataChannelState> = AsyncStream { (continuation: AsyncStream<DataChannelState>.Continuation) in
+        self.stateContinuation = continuation
+    }
+
+    private var stateContinuation: AsyncStream<DataChannelState>.Continuation?
+
+    private(set) lazy var events: AsyncStream<DataChannelEvent> = AsyncStream { (continuation: AsyncStream<DataChannelEvent>.Continuation) in
+        self.eventsContinuation = continuation
+    }
+
+    private(set) var eventsContinuation: AsyncStream<DataChannelEvent>.Continuation?
 }

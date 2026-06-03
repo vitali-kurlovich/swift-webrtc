@@ -3,20 +3,14 @@
 //
 
 import Logging
-import Observation
 import WebRTC
 
-@Observable
 public final class DataChannel: @unchecked Sendable {
-    /** The state of the data channel. */
-    public internal(set) var readyState: DataChannelState
-
     let channel: RTCDataChannel
     private let channelDelegate: DataChannelDelegate
 
     init(_ channel: RTCDataChannel) {
         self.channel = channel
-        readyState = DataChannelState(channel.readyState)
         channelDelegate = DataChannelDelegate()
 
         channelDelegate.channel = self
@@ -36,8 +30,16 @@ public extension DataChannel {
 }
 
 public extension DataChannel {
-    var messages: AsyncStream<DataMessage> {
-        channelDelegate.messages
+    var messageUpdates: AsyncStream<DataMessage> {
+        channelDelegate.messageUpdates
+    }
+
+    var stateUpdates: AsyncStream<DataChannelState> {
+        channelDelegate.stateUpdates
+    }
+
+    var events: AsyncStream<DataChannelEvent> {
+        channelDelegate.events
     }
 }
 
@@ -52,7 +54,10 @@ public extension DataChannel {
         if channel.sendData(buffer) {
             let dataBuffer = DataBuffer(buffer)
             let message = DataMessage(channelId: channelId, type: .outcoming, buffer: dataBuffer)
-            continuation?.yield(message)
+
+            messageUpdatesContinuation?.yield(message)
+            eventsContinuation?.yield(.sendMessage)
+
             return true
         }
         return false
@@ -62,10 +67,16 @@ public extension DataChannel {
     func close() {
         logger?.info("\(String(describing: Self.self)) close")
         channel.close()
+        eventsContinuation?.yield(.close)
     }
 }
 
 public extension DataChannel {
+    /** The state of the data channel. */
+    var readyState: DataChannelState {
+        DataChannelState(channel.readyState)
+    }
+
     /**
      * A label that can be used to distinguish this data channel from other data
      * channel objects.
@@ -116,7 +127,11 @@ public extension DataChannel {
 }
 
 private extension DataChannel {
-    var continuation: AsyncStream<DataMessage>.Continuation? {
-        channelDelegate.continuation
+    var messageUpdatesContinuation: AsyncStream<DataMessage>.Continuation? {
+        channelDelegate.messageUpdatesContinuation
+    }
+
+    var eventsContinuation: AsyncStream<DataChannelEvent>.Continuation? {
+        channelDelegate.eventsContinuation
     }
 }
