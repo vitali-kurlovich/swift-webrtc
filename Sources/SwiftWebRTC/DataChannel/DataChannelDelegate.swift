@@ -26,7 +26,7 @@ final class DataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Se
         logger?.debug("RTCDataChannelDelegate didReceiveMessageWith: \(buffer.description)")
 
         let buffer = DataBuffer(data: buffer.data, isBinry: buffer.isBinary)
-        let message = DataMessage(channelId: dataChannel.channelId, source: .remote, buffer: buffer)
+        let message = DataMessage(channelId: dataChannel.channelId, type: .incoming, buffer: buffer)
 
         continuation?.yield(message)
     }

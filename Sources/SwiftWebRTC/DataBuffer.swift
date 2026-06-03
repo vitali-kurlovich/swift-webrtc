@@ -13,3 +13,9 @@ public struct DataBuffer: Hashable, Sendable {
         self.isBinry = isBinry
     }
 }
+
+extension DataBuffer {
+    init(_ buffer: RTCDataBuffer) {
+        self.init(data: buffer.data, isBinry: buffer.isBinary)
+    }
+}

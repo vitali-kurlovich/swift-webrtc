@@ -51,7 +51,7 @@ public extension DataChannel {
 
         if channel.sendData(buffer) {
             let dataBuffer = DataBuffer(buffer)
-            let message = DataMessage(channelId: channelId, source: .local, buffer: dataBuffer)
+            let message = DataMessage(channelId: channelId, type: .outcoming, buffer: dataBuffer)
             continuation?.yield(message)
             return true
         }
@@ -83,8 +83,8 @@ public extension DataChannel {
      * The length of the time window (in milliseconds) during which transmissions
      * and retransmissions may occur in unreliable mode.
      */
-    var maxPacketLifeTime: UInt16 {
-        channel.maxPacketLifeTime
+    var maxPacketLifeTime: Duration {
+        .milliseconds(channel.maxPacketLifeTime)
     }
 
     /**
