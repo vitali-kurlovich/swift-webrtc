@@ -6,7 +6,8 @@ import SwiftUI
 import SwiftWebRTC
 
 struct PeerConnectionInfo: View {
-    let connection: PeerConnection
+    @ObservedObject
+    var connection: PeerConnection
 
     var body: some View {
         Form {

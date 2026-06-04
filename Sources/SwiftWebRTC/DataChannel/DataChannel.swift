@@ -5,15 +5,19 @@
 import Logging
 import WebRTC
 
-public final class DataChannel: @unchecked Sendable {
+public final class DataChannel: ObservableObject, @unchecked Sendable {
     let channel: RTCDataChannel
     private let channelDelegate: DataChannelDelegate
+
+    private var eventsTask: Task<Void, Never>?
 
     init(_ channel: RTCDataChannel) {
         self.channel = channel
         channelDelegate = DataChannelDelegate()
 
         channel.delegate = channelDelegate
+
+        subscribeForEvents()
     }
 }
 
@@ -132,5 +136,23 @@ private extension DataChannel {
 
     var eventsContinuation: AsyncStream<DataChannelEvent>.Continuation {
         channelDelegate.eventsContinuation
+    }
+}
+
+private extension DataChannel {
+    func subscribeForEvents() {
+        eventsTask = Task { [weak self, events] in
+            for await _ in events {
+                if let self {
+                    await invalidate()
+                }
+            }
+        }
+    }
+
+    func invalidate() async {
+        await MainActor.run {
+            objectWillChange.send()
+        }
     }
 }

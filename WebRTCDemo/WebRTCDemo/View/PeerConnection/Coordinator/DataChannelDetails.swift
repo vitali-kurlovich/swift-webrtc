@@ -7,7 +7,8 @@ import SwiftUIComponents
 import SwiftWebRTC
 
 struct DataChannelDetails: View {
-    let channel: DataChannel
+    @ObservedObject
+    var channel: DataChannel
 
     var body: some View {
         LabeledContent("Channel Id", value: channel.channelId, format: .number)

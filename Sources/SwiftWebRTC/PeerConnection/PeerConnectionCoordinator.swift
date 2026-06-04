@@ -2,9 +2,10 @@
 //  Created by Kurlovich Vitali on 6/3/26.
 //
 
+import Combine
 import Logging
 
-public final class PeerConnectionCoordinator: @unchecked Sendable {
+public final class PeerConnectionCoordinator: ObservableObject, @unchecked Sendable {
     public var logger: Logger?
 
     public let connection: PeerConnection
@@ -14,6 +15,7 @@ public final class PeerConnectionCoordinator: @unchecked Sendable {
     private var sessionsTask: Task<Void, Never>?
     private var candidatesTask: Task<Void, Never>?
 
+    @Published
     public private(set) var channels: [DataChannel] = []
 
     public init(connection: PeerConnection, signalProvider: any SignalProvider, logger: Logger? = nil) {
@@ -154,6 +156,9 @@ private extension PeerConnectionCoordinator {
         case let .openChannel(channel):
             logger?.debug("\(String(describing: Self.self)) openChannel \(channel)")
             channels.append(channel)
+        // -------- Close --------
+        case .close:
+            logger?.debug("\(String(describing: Self.self)) close")
         }
     }
 }

@@ -7,7 +7,8 @@ import SwiftUIComponents
 import SwiftWebRTC
 
 struct PeerConnectionStatusInfo: View {
-    let connection: PeerConnection
+    @ObservedObject
+    var connection: PeerConnection
 
     var body: some View {
         TwoColumn {

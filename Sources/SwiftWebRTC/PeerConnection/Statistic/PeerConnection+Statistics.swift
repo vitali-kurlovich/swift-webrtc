@@ -5,7 +5,7 @@
 import WebRTC
 
 public extension PeerConnection {
-    /*  Gather stats for the given RTCMediaStreamTrack. If `mediaStreamTrack` is
+    /**  Gather stats for the given RTCMediaStreamTrack. If `mediaStreamTrack` is
      * nil statistics are gathered for all tracks.
      */
     func stats(for mediaStreamTrack: RTCMediaStreamTrack?, statsOutputLevel level: StatsOutputLevel) async -> [LegacyStatsReport] {

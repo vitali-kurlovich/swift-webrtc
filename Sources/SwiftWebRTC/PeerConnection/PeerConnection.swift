@@ -10,12 +10,14 @@ public enum PeerConnectionError: Error {
     case cantCreateNewDataChannel
 }
 
-public final class PeerConnection: @unchecked Sendable {
+public final class PeerConnection: ObservableObject, @unchecked Sendable {
     private let factory: RTCPeerConnectionFactory
     private let configuration: RTCConfiguration
 
     let peerConnection: RTCPeerConnection
     private let connectionDelegate: PeerConnectionDelegate
+
+    private var eventsTask: Task<Void, Never>?
 
     public init(factory: RTCPeerConnectionFactory,
                 configuration: RTCConfiguration,
@@ -38,6 +40,8 @@ public final class PeerConnection: @unchecked Sendable {
         peerConnection = connection
 
         self.logger = logger
+
+        subscribeForEvents()
     }
 }
 
@@ -227,5 +231,23 @@ private extension PeerConnection {
         let videoEncoderFactory = RTCDefaultVideoEncoderFactory()
         let videoDecoderFactory = RTCDefaultVideoDecoderFactory()
         return RTCPeerConnectionFactory(encoderFactory: videoEncoderFactory, decoderFactory: videoDecoderFactory)
+    }
+}
+
+private extension PeerConnection {
+    func subscribeForEvents() {
+        eventsTask = Task { [weak self, events] in
+            for await _ in events {
+                if let self {
+                    await invalidate()
+                }
+            }
+        }
+    }
+
+    func invalidate() async {
+        await MainActor.run {
+            objectWillChange.send()
+        }
     }
 }

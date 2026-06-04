@@ -7,7 +7,8 @@ import SwiftUIComponents
 import SwiftWebRTC
 
 struct DataChannelGroup<Content: View>: View {
-    let channel: DataChannel
+    @ObservedObject
+    var channel: DataChannel
 
     let content: (DataChannel) -> Content
 
