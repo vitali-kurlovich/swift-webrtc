@@ -30,6 +30,12 @@ struct DataChannelGroup<Content: View>: View {
                 Spacer()
                 Text(channel.label)
             }
+        }.contextMenu {
+            Button(role: .destructive) {
+                channel.close()
+            } label: {
+                Label("Close Channel", systemImage: "trash")
+            }
         }
     }
 }
