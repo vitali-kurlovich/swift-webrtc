@@ -5,7 +5,7 @@
 import WebRTC
 
 /** Represents the signaling state of the peer connection. */
-public enum SignalingState: Int8, Hashable, CaseIterable, Sendable {
+public enum SignalingState: Int8, Hashable, CaseIterable, Codable, Sendable {
     case stable = 0
 
     case haveLocalOffer = 1

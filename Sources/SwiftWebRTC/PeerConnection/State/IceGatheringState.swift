@@ -5,7 +5,7 @@
 import WebRTC
 
 /** Represents the ice gathering state of the peer connection. */
-public enum IceGatheringState: Int8, Hashable, CaseIterable, Sendable {
+public enum IceGatheringState: Int8, Hashable, CaseIterable, Codable, Sendable {
     case new = 0
 
     case gathering = 1
