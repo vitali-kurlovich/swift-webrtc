@@ -44,15 +44,15 @@ struct DataChannelDetails: View {
             Spacer()
 
             Button("Send Message", role: .confirm) {
-                let data = Data(inputText.utf8)
-                let buffer = DataBuffer(data: data, isBinry: false)
-
-                if channel.send(buffer) {
-                    debugPrint("Sending data")
-                    inputText = ""
-                } else {
-                    debugPrint("Data do not sending")
-                }
+                //  let data = Data(inputText.utf8)
+                //   let buffer = DataBuffer(data: data, isBinry: false)
+//
+//                if channel.send(buffer) {
+//                    debugPrint("Sending data")
+//                    inputText = ""
+//                } else {
+//                    debugPrint("Data do not sending")
+//                }
 
             }.disabled(inputText.isEmpty || channel.readyState == .closed)
         }

@@ -15,7 +15,7 @@ public enum PeerConnectionEvent: Sendable {
     case generateCandidate(IceCandidate)
     case removeCandidateas([IceCandidate])
 
-    case openChannel(DataChannel)
+    case openChannel(RemoteDataChannel)
 
     case close
 }

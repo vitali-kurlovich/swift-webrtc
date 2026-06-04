@@ -17,8 +17,6 @@ extension DataChannelState: @retroactive CustomStringConvertible {
             "Closing"
         case .closed:
             "Closed"
-        case .unknown:
-            "Uncknown"
         }
     }
 }
@@ -33,8 +31,6 @@ struct DataChannelStateColorResolver: StatusIndicatorColorResolver {
         case .closing:
             Color.red
         case .closed:
-            Color.secondary
-        case .unknown:
             Color.secondary
         }
     }

@@ -5,17 +5,28 @@
 import Logging
 import WebRTC
 
-public final class DataChannel: ObservableObject, @unchecked Sendable {
+public enum DataChannelType: Hashable, Sendable {
+    case local
+    case remote
+}
+
+public class DataChannel: ObservableObject, @unchecked Sendable {
     let channel: RTCDataChannel
+    public let type: DataChannelType
+
     private let channelDelegate: DataChannelDelegate
 
     private var eventsTask: Task<Void, Never>?
 
-    init(_ channel: RTCDataChannel) {
+    init(_ channel: RTCDataChannel, type: DataChannelType, logger: Logger? = nil) {
+        self.type = type
         self.channel = channel
+
         channelDelegate = DataChannelDelegate()
 
         channel.delegate = channelDelegate
+
+        self.logger = logger
 
         subscribeForEvents()
     }
@@ -32,11 +43,13 @@ public extension DataChannel {
     }
 }
 
-public extension DataChannel {
-    var messageUpdates: AsyncStream<DataMessage> {
+extension DataChannel {
+    var _messageUpdates: AsyncStream<DataMessage> {
         channelDelegate.messageUpdates
     }
+}
 
+public extension DataChannel {
     var stateUpdates: AsyncStream<DataChannelState> {
         channelDelegate.stateUpdates
     }
@@ -101,9 +114,9 @@ public extension DataChannel {
     }
 }
 
-public extension DataChannel {
+extension DataChannel {
     /** Attempt to send `buffer` on this data channel's underlying data transport. */
-    func send(_ buffer: DataBuffer) -> Bool {
+    func _send(_ buffer: DataBuffer) -> Bool {
         logger?.info("\(String(describing: Self.self)) send")
         logger?.debug("buffer \(buffer)")
 
@@ -120,7 +133,9 @@ public extension DataChannel {
         }
         return false
     }
+}
 
+public extension DataChannel {
     /** Closes the data channel. */
     func close() {
         logger?.info("\(String(describing: Self.self)) close")

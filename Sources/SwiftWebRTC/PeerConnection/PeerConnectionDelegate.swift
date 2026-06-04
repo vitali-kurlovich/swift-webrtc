@@ -84,7 +84,7 @@ final class PeerConnectionDelegate: NSObject, RTCPeerConnectionDelegate, @unchec
     func peerConnection(_: RTCPeerConnection, didOpen channel: RTCDataChannel) {
         logger?.debug("RTCPeerConnectionDelegate didOpen channel: \(channel.description)")
 
-        let channel = DataChannel(channel)
+        let channel = RemoteDataChannel(channel)
         continuation.yield(.openChannel(channel))
     }
 }

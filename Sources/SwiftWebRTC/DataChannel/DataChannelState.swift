@@ -9,7 +9,6 @@ public enum DataChannelState: Int8, Hashable, CaseIterable, Sendable {
     case open = 1
     case closing = 2
     case closed = 3
-    case unknown = -1
 }
 
 extension DataChannelState {
@@ -24,7 +23,7 @@ extension DataChannelState {
         case .closed:
             self = .closed
         @unknown default:
-            self = .unknown
+            self = .connecting
         }
     }
 }

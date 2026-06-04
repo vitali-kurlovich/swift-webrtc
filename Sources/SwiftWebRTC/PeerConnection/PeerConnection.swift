@@ -125,7 +125,7 @@ public extension PeerConnection {
 
 public extension PeerConnection {
     /** Create a new data channel with the given label and configuration. */
-    func channel(label: String, with configuration: DataChannelConfiguration = .init()) throws -> DataChannel {
+    func channel(label: String, with configuration: DataChannelConfiguration = .init()) throws -> LocalDataChannel {
         logger?.info("\(String(describing: Self.self)) channel")
 
         guard let channel = peerConnection.dataChannel(forLabel: label, configuration: .init(configuration)) else {
@@ -134,9 +134,7 @@ public extension PeerConnection {
             throw error
         }
 
-        let dataChanel = DataChannel(channel)
-        dataChanel.logger = logger
-        return dataChanel
+        return LocalDataChannel(channel, logger: logger)
     }
 }
 

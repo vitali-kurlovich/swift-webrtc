@@ -56,11 +56,11 @@ private extension DataChannelHistory {
 private extension DataChannelHistory {
     func subscribeUpdates() {
         messagesTask = Task { [channel, weak self] in
-            for await message in channel.messageUpdates {
-                if let self {
-                    await append(message)
-                }
-            }
+//            for await message in channel.messageUpdates {
+//                if let self {
+//                    await append(message)
+//                }
+//            }
         }
     }
 }

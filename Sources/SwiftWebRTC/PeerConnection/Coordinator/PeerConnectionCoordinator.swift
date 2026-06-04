@@ -58,7 +58,7 @@ public extension PeerConnectionCoordinator {
         }
     }
 
-    func newChannel(label: String) throws -> DataChannel {
+    func newChannel(label: String) throws -> LocalDataChannel {
         do {
             logger?.info("\(String(describing: Self.self)) channel label:\(label)")
             let channel = try connection.channel(label: label)
