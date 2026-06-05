@@ -17,8 +17,6 @@ public enum PeerConnectionState: Int8, Hashable, CaseIterable, Codable, Sendable
     case failed = 4
 
     case closed = 5
-
-    case unknown = -1
 }
 
 extension PeerConnectionState {
@@ -37,7 +35,8 @@ extension PeerConnectionState {
         case .closed:
             self = .closed
         @unknown default:
-            self = .unknown
+            assertionFailure()
+            self = .new
         }
     }
 }

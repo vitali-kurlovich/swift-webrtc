@@ -21,8 +21,6 @@ public enum IceConnectionState: Int8, Hashable, CaseIterable, Codable, Sendable 
     case closed = 6
 
     case count = 7
-
-    case unknown = -1
 }
 
 extension IceConnectionState {
@@ -45,7 +43,8 @@ extension IceConnectionState {
         case .count:
             self = .count
         @unknown default:
-            self = .unknown
+            assertionFailure()
+            self = .new
         }
     }
 }

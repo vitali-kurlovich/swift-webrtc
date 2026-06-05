@@ -111,7 +111,14 @@ public extension IceServer {
      * optional credential, TLS cert policy, hostname, ALPN protocols and
      * elliptic curves.
      */
-    init(urlStrings: [String], username: String?, credential: String?, tlsCertPolicy: TlsCertPolicy, hostname: String?, tlsAlpnProtocols: [String]?, tlsEllipticCurves: [String]?) {
+    init(urlStrings: [String],
+         username: String?,
+         credential: String?,
+         tlsCertPolicy: TlsCertPolicy,
+         hostname: String?,
+         tlsAlpnProtocols: [String]?,
+         tlsEllipticCurves: [String]?)
+    {
         let server = RTCIceServer(urlStrings: urlStrings,
                                   username: username,
                                   credential: credential,

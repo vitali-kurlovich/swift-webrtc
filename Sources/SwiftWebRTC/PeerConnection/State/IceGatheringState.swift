@@ -11,8 +11,6 @@ public enum IceGatheringState: Int8, Hashable, CaseIterable, Codable, Sendable {
     case gathering = 1
 
     case complete = 2
-
-    case unknown = -1
 }
 
 extension IceGatheringState {
@@ -25,7 +23,8 @@ extension IceGatheringState {
         case .complete:
             self = .complete
         @unknown default:
-            self = .unknown
+            assertionFailure()
+            self = .new
         }
     }
 }

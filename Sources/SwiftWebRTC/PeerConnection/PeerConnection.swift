@@ -13,7 +13,7 @@ public enum PeerConnectionError: Error {
 public final class PeerConnection: ObservableObject, @unchecked Sendable {
     let factory: PeerConnectionFactory
     let peerConnection: RTCPeerConnection
-    
+
     private let connectionDelegate: PeerConnectionDelegate
 
     private var eventsTask: Task<Void, Never>?
@@ -24,7 +24,7 @@ public final class PeerConnection: ObservableObject, @unchecked Sendable {
                 logger: Logger? = nil) throws
     {
         self.factory = factory
-        
+
         let constraints = RTCMediaConstraints(mandatoryConstraints: nil,
                                               optionalConstraints: optional.dict)
 

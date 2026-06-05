@@ -17,8 +17,6 @@ public enum SignalingState: Int8, Hashable, CaseIterable, Codable, Sendable {
     case haveRemotePrAnswer = 4
 
     case closed = 5
-
-    case unknown = -1
 }
 
 extension SignalingState {
@@ -37,7 +35,8 @@ extension SignalingState {
         case .closed:
             self = .closed
         @unknown default:
-            self = .unknown
+            assertionFailure()
+            self = .stable
         }
     }
 }

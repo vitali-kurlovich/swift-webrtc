@@ -21,8 +21,6 @@ extension SignalingState: @retroactive CustomStringConvertible {
             "Have Remote Pr Answer"
         case .closed:
             "Closed"
-        case .unknown:
-            "Uncknown"
         }
     }
 }
@@ -42,8 +40,6 @@ struct SignalingStateColorResolver: StatusIndicatorColorResolver {
             Color.orange
         case .closed:
             Color.secondary
-        case .unknown:
-            Color.gray
         }
     }
 }

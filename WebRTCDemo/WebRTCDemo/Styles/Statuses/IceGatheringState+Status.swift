@@ -15,8 +15,6 @@ extension IceGatheringState: @retroactive CustomStringConvertible {
             "Gathering"
         case .complete:
             "Complete"
-        case .unknown:
-            "Uncknown"
         }
     }
 }
@@ -30,8 +28,6 @@ struct IceGatheringStateColorResolver: StatusIndicatorColorResolver {
             Color.orange
         case .complete:
             Color.accentColor
-        case .unknown:
-            Color.secondary
         }
     }
 }

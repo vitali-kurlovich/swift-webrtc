@@ -5,7 +5,7 @@
 import Foundation
 import WebRTC
 
-public struct LegacyStatsReport {
+public struct LegacyStatsReport: Hashable, Codable, Sendable {
     public let timestamp: Date
 
     /** The type of stats held by this object. */

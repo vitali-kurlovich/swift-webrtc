@@ -25,8 +25,6 @@ extension IceConnectionState: @retroactive CustomStringConvertible {
             "Closed"
         case .count:
             "Count"
-        case .unknown:
-            "Uncknown"
         }
     }
 }
@@ -49,8 +47,6 @@ struct IceConnectionStateColorResolver: StatusIndicatorColorResolver {
         case .closed:
             Color.secondary
         case .count:
-            Color.secondary
-        case .unknown:
             Color.secondary
         }
     }

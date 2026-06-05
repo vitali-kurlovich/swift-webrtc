@@ -4,7 +4,7 @@
 
 import WebRTC
 
-public struct Certificate: Hashable, Sendable {
+public struct Certificate: Hashable, Codable, Sendable {
     /// Private key in PEM.
     public let privateKey: String
 

@@ -21,8 +21,6 @@ extension PeerConnectionState: @retroactive CustomStringConvertible {
             "Failed"
         case .closed:
             "Closed"
-        case .unknown:
-            "Uncknown"
         }
     }
 }
@@ -41,8 +39,6 @@ struct PeerConnectionStatusColorResolver: StatusIndicatorColorResolver {
         case .failed:
             Color.red
         case .closed:
-            Color.secondary
-        case .unknown:
             Color.secondary
         }
     }
