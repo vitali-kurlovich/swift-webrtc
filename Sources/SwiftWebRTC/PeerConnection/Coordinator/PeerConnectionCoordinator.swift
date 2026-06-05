@@ -16,11 +16,18 @@ public final class PeerConnectionCoordinator: ObservableObject, @unchecked Senda
     private var candidatesTask: Task<Void, Never>?
 
     @Published
-    public private(set) var channels: [DataChannel] = []
+    public private(set) var channels: [BidirectionalDataChannel] = []
 
-    public init(connection: PeerConnection, signalProvider: any SignalProvider, logger: Logger? = nil) {
+    private var localChannels: [LocalDataChannel] = []
+    private var remoteChannels: [RemoteDataChannel] = []
+
+    public init(connection: PeerConnection,
+                signalProvider: any SignalProvider,
+                logger: Logger? = nil)
+    {
         self.connection = connection
         self.signalProvider = signalProvider
+
         self.logger = logger
 
         subscribeEvents()
@@ -62,7 +69,7 @@ public extension PeerConnectionCoordinator {
         do {
             logger?.info("\(String(describing: Self.self)) channel label:\(label)")
             let channel = try connection.channel(label: label)
-            channels.append(channel)
+            localChannels.append(channel)
             return channel
 
         } catch {
@@ -155,7 +162,8 @@ private extension PeerConnectionCoordinator {
         // -------- Channel --------
         case let .openChannel(channel):
             logger?.debug("\(String(describing: Self.self)) openChannel \(channel)")
-            channels.append(channel)
+
+            remoteChannels.append(channel)
         // -------- Close --------
         case .close:
             logger?.debug("\(String(describing: Self.self)) close")

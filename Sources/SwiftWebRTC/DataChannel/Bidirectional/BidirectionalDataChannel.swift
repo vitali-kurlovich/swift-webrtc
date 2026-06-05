@@ -20,10 +20,11 @@ public final class BidirectionalDataChannel: ObservableObject, @unchecked Sendab
 
     public let statusUpdate: AsyncStream<DataChannelState>
     private let statusUpdateContinuation: AsyncStream<DataChannelState>.Continuation
-    // DataChannelState
 
     private var statusIncomingTask: Task<Void, Never>?
     private var statusOutcomingTask: Task<Void, Never>?
+
+    private var incomingMessagesTask: Task<Void, Never>?
 
     deinit {
         messagesContinuation.finish()
@@ -44,61 +45,18 @@ public final class BidirectionalDataChannel: ObservableObject, @unchecked Sendab
         let (statusUpdate, statusUpdateContinuation) = AsyncStream.makeStream(of: DataChannelState.self)
         self.statusUpdate = statusUpdate
         self.statusUpdateContinuation = statusUpdateContinuation
+
+        subscribeStatusUpdate()
+        subscribeMessages()
     }
 }
 
-extension BidirectionalDataChannel {
-    func subscribeStatusUpdate() {
-        let incomingStateUpdates = incoming.stateUpdates
-        let outcomingStateUpdates = outcoming.stateUpdates
-
-        statusIncomingTask = Task { [weak self] in
-            for await _ in incomingStateUpdates {
-                if let self {
-                    statusUpdateContinuation.yield(readyState)
-                    await invalidate()
-                }
-            }
-        }
-
-        statusOutcomingTask = Task { [weak self] in
-            for await _ in outcomingStateUpdates {
-                if let self {
-                    statusUpdateContinuation.yield(readyState)
-                    await invalidate()
-                }
-            }
-        }
-    }
-
-    func invalidate() async {
-        await MainActor.run {
-            objectWillChange.send()
-        }
+extension BidirectionalDataChannel: Identifiable {
+    public var id: Int {
+        let resolver = BidirectionalChannelIDResolver()
+        return resolver.resolve(incoming.channelId, outcoming.channelId)
     }
 }
-
-/*
-
- private extension PeerConnection {
-     func subscribeForEvents() {
-         eventsTask = Task { [weak self, events] in
-             for await _ in events {
-                 if let self {
-                     await invalidate()
-                 }
-             }
-         }
-     }
-
-     func invalidate() async {
-         await MainActor.run {
-             objectWillChange.send()
-         }
-     }
- }
-
- */
 
 public extension BidirectionalDataChannel {
     var isReady: Bool {
@@ -125,28 +83,43 @@ public extension BidirectionalDataChannel {
     }
 }
 
-extension DataChannelState {
-    func merge(_ other: DataChannelState) -> DataChannelState {
-        if other == self {
-            return self
+private extension BidirectionalDataChannel {
+    func subscribeStatusUpdate() {
+        let incomingStateUpdates = incoming.stateUpdates
+        let outcomingStateUpdates = outcoming.stateUpdates
+
+        statusIncomingTask = Task { [weak self] in
+            for await _ in incomingStateUpdates {
+                if let self {
+                    statusUpdateContinuation.yield(readyState)
+                    await invalidate()
+                }
+            }
         }
 
-        if self == .closed || other == .closed {
-            return .closed
+        statusOutcomingTask = Task { [weak self] in
+            for await _ in outcomingStateUpdates {
+                if let self {
+                    statusUpdateContinuation.yield(readyState)
+                    await invalidate()
+                }
+            }
         }
+    }
 
-        if self == .closing || other == .closing {
-            return .closing
+    func subscribeMessages() {
+        let messageUpdates = incoming.messageUpdates
+
+        incomingMessagesTask = Task { [messagesContinuation] in
+            for await message in messageUpdates {
+                messagesContinuation.yield(.receive(message))
+            }
         }
+    }
 
-        if self == .open {
-            return other
+    func invalidate() async {
+        await MainActor.run {
+            objectWillChange.send()
         }
-
-        if other == .open {
-            return self
-        }
-
-        return .connecting
     }
 }

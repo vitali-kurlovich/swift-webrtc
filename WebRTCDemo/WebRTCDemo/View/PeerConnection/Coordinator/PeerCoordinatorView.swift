@@ -58,10 +58,12 @@ struct PeerCoordinatorView: View {
                 }
             }
             Section("Channels") {
-                ForEach(coordinator.channels, id: \.channelId) { channel in
-                    DataChannelGroup(channel: channel) { channel in
-                        DataChannelDetails(channel: channel)
-                    }
+                ForEach(coordinator.channels) { channel in
+                    Text("\(channel.readyState)")
+
+//                    DataChannelGroup(channel: channel) { channel in
+//                        DataChannelDetails(channel: channel)
+//                    }
                 }
 
                 Button("New Channel") {
