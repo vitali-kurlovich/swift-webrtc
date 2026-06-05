@@ -5,7 +5,7 @@
 import WebRTC
 
 /// Swift bindings for webrtc::CryptoOptions.
-public struct CryptoOptions: OptionSet {
+public struct CryptoOptions: OptionSet, Hashable, Codable, Sendable {
     public let rawValue: Int8
 
     public init(rawValue: Int8) {

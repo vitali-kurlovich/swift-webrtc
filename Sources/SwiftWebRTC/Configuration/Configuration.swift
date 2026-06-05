@@ -4,7 +4,7 @@
 
 import WebRTC
 
-public struct Configuration {
+public struct Configuration: Hashable, Sendable {
     /// If true, allows DSCP codes to be set on outgoing packets, configured using networkPriority field of RTCRtpEncodingParameters. Defaults to false.
     public var enableDscp: Bool
 
@@ -179,7 +179,7 @@ public extension Configuration {
 extension Configuration {
     init(_ config: RTCConfiguration) {
         self.init(enableDscp: config.enableDscp,
-                  iceServers: config.iceServers.map { IceServer(server: $0) },
+                  iceServers: config.iceServers.map { IceServer($0) },
                   iceTransportPolicy: .init(config.iceTransportPolicy),
                   bundlePolicy: .init(config.bundlePolicy),
                   rtcpMuxPolicy: .init(config.rtcpMuxPolicy),
@@ -212,7 +212,7 @@ extension RTCConfiguration {
         self.init()
 
         enableDscp = config.enableDscp
-        iceServers = config.iceServers.map(\.server)
+        iceServers = config.iceServers.map { RTCIceServer($0) }
         iceTransportPolicy = .init(config.iceTransportPolicy)
         bundlePolicy = .init(config.bundlePolicy)
         rtcpMuxPolicy = .init(config.rtcpMuxPolicy)

@@ -4,7 +4,7 @@
 
 import WebRTC
 
-public enum TlsCertPolicy: Int8, Hashable, CaseIterable, Sendable {
+public enum TlsCertPolicy: Int8, Hashable, CaseIterable, Codable, Sendable {
     case secure = 0
 
     case insecureNoCheck = 1
