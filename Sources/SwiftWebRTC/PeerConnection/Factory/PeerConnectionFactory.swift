@@ -63,3 +63,28 @@ public extension PeerConnectionFactory {
         return try peerConnection(configuration: configuration, options: options, logger: logger)
     }
 }
+
+public extension PeerConnectionFactory {
+    func audioTrack(trackId: String) -> AudioTrack {
+        let audioConstrains = RTCMediaConstraints(mandatoryConstraints: nil, optionalConstraints: nil)
+        let audioSource = factory.audioSource(with: audioConstrains)
+        let track = factory.audioTrack(with: audioSource, trackId: trackId)
+
+        return AudioTrack(track)
+    }
+
+    func videoTrack(trackId: String) -> VideoTrack {
+        let videoSource = factory.videoSource()
+
+        #if targetEnvironment(simulator)
+            let videoCapturer = RTCFileVideoCapturer(delegate: videoSource)
+        #else
+            let videoCapturer = RTCCameraVideoCapturer(delegate: videoSource)
+        #endif
+
+        RTCVideoCapturer
+
+        let track = factory.videoTrack(with: videoSource, trackId: trackId)
+        return VideoTrack(track)
+    }
+}
