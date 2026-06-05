@@ -4,16 +4,16 @@
 
 import OSLog
 
-struct OSLoggingSystem {
+struct OSLoggingSystem: Hashable {
     let subsystem: String
 
-    nonisolated init(subsystem: String = Bundle.main.bundleIdentifier ?? "") {
+    init(subsystem: String = Bundle.main.bundleIdentifier ?? "") {
         self.subsystem = subsystem
     }
 }
 
 extension OSLoggingSystem {
-    nonisolated static let `default` = OSLoggingSystem()
+    static let `default` = OSLoggingSystem()
 
     @inlinable
     var network: Logger {

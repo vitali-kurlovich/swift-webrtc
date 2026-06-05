@@ -28,7 +28,7 @@ final class LogsObserver: ObservableObject {
         bootstrap.inMemoryHandler.entries
     }
 
-    nonisolated func invalidate() {
+    func invalidate() {
         Task { @MainActor in
             objectWillChange.send()
         }
