@@ -82,7 +82,7 @@ public extension PeerConnection {
     }
 }
 
-extension PeerConnection {
+public extension PeerConnection {
     var events: AsyncStream<PeerConnectionEvent> {
         connectionDelegate.events
     }
