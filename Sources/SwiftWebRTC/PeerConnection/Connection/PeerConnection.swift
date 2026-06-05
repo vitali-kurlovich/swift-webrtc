@@ -6,38 +6,25 @@ import Logging
 import WebRTC
 
 public enum PeerConnectionError: Error {
-    case cantCreateNewConnection
     case cantCreateNewDataChannel
 }
 
 public final class PeerConnection: ObservableObject, @unchecked Sendable {
-    let factory: PeerConnectionFactory
     let peerConnection: RTCPeerConnection
 
     private let connectionDelegate: PeerConnectionDelegate
 
     private var eventsTask: Task<Void, Never>?
 
-    public init(factory: PeerConnectionFactory,
-                configuration: Configuration,
-                optional: PeerMediaOption = [.tlsSrtp],
-                logger: Logger? = nil) throws
-    {
-        self.factory = factory
+    deinit {
+        logger?.debug("\(String(describing: Self.self)) deinit")
+    }
 
-        let constraints = RTCMediaConstraints(mandatoryConstraints: nil,
-                                              optionalConstraints: optional.dict)
+    init(peerConnection: RTCPeerConnection, logger: Logger?) {
+        self.peerConnection = peerConnection
+        connectionDelegate = PeerConnectionDelegate(logger: logger)
 
-        let connectionDelegate = PeerConnectionDelegate()
-        self.connectionDelegate = connectionDelegate
-
-        guard let connection = factory.factory.peerConnection(with: .init(configuration), constraints: constraints, delegate: connectionDelegate) else {
-            throw PeerConnectionError.cantCreateNewConnection
-        }
-
-        peerConnection = connection
-
-        self.logger = logger
+        peerConnection.delegate = connectionDelegate
 
         subscribeForEvents()
     }
@@ -58,25 +45,6 @@ public extension PeerConnection {
 
     var iceGatheringState: IceGatheringState {
         .init(peerConnection.iceGatheringState)
-    }
-}
-
-public extension PeerConnection {
-    convenience init(factory: PeerConnectionFactory, configuration: Configuration) throws {
-        try self.init(factory: factory, configuration: configuration)
-    }
-
-    convenience init(factory: PeerConnectionFactory, iceServers: [IceServer]) throws {
-        var configuration = Configuration()
-        configuration.iceServers = iceServers
-
-        // Unified plan is more superior than planB
-        configuration.sdpSemantics = .unifiedPlan
-
-        // gatherContinually will let WebRTC to listen to any network changes and send any new candidates to the other client
-        configuration.continualGatheringPolicy = .gatherContinually
-
-        try self.init(factory: factory, configuration: configuration)
     }
 }
 

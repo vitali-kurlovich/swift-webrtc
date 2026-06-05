@@ -21,6 +21,8 @@ final class ConnectionCoordinator {
 
     private var iceServers: [String] = []
 
+    let factory = PeerConnectionFactory(logger: LoggingEvents.default.webrct)
+
     var status: Status = .uninitialized
 
     func update(with configuration: AppConfiguration) {
@@ -36,9 +38,8 @@ final class ConnectionCoordinator {
 
         do {
             let servers = iceServers.map { IceServer(urlStrings: [$0]) }
-            let connection = try PeerConnection(factory: .init(), iceServers: servers)
 
-            connection.logger = LoggingEvents.default.webrct
+            let connection = try factory.peerConnection(iceServers: servers)
 
             status = .ready(connection)
 

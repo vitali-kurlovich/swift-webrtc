@@ -12,14 +12,15 @@ final class PeerConnectionDelegate: NSObject, RTCPeerConnectionDelegate, @unchec
     private let continuation: AsyncStream<PeerConnectionEvent>.Continuation
 
     deinit {
+        logger?.debug("\(String(describing: Self.self)) deinit")
         continuation.finish()
     }
 
-    override init() {
+    init(logger: Logger?) {
         let (events, continuation) = AsyncStream.makeStream(of: PeerConnectionEvent.self)
         self.events = events
         self.continuation = continuation
-
+        self.logger = logger
         super.init()
     }
 
