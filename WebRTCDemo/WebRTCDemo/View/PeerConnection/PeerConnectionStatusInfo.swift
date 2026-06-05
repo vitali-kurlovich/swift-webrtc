@@ -41,6 +41,6 @@ struct PeerConnectionStatusInfo: View {
 }
 
 #Preview {
-    PeerConnectionStatusInfo(connection: try! PeerConnection(iceServers: []))
+    PeerConnectionStatusInfo(connection: try! PeerConnection(factory: .init(), iceServers: []))
         .useDefaultStatusStyle()
 }

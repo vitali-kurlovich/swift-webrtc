@@ -6,19 +6,18 @@ import Foundation
 import WebRTC
 
 public struct Statistics: Hashable, Sendable {
-    /** The id of this subreport, e.g. "RTCMediaStreamTrack_receiver_2". */
+    /// The id of this subreport, e.g. "RTCMediaStreamTrack_receiver_2".
     public let id: String
-    /** The timestamp of the subreport in microseconds since 1970-01-01T00:00:00Z.
-     */
+
+    /// The timestamp of the subreport in microseconds since 1970-01-01T00:00:00Z.
     public let timestamp: Date
 
-    /** The type of the subreport, e.g. "track", "codec". */
+    /// The type of the subreport, e.g. "track", "codec".
     public let type: String
 
-    /*  The keys and values of the subreport, e.g. "totalFramesDuration = 5.551".
-        The values are  StatisticsValue
+    /**  The keys and values of the subreport, e.g. "totalFramesDuration = 5.551".
+     The values are  StatisticsValue
      */
-
     public let values: [String: StatisticsValue]
 }
 

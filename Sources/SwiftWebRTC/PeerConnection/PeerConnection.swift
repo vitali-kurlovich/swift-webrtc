@@ -11,29 +11,27 @@ public enum PeerConnectionError: Error {
 }
 
 public final class PeerConnection: ObservableObject, @unchecked Sendable {
-    private let factory: RTCPeerConnectionFactory
-    private let configuration: RTCConfiguration
-
+    let factory: PeerConnectionFactory
     let peerConnection: RTCPeerConnection
+    
     private let connectionDelegate: PeerConnectionDelegate
 
     private var eventsTask: Task<Void, Never>?
 
-    public init(factory: RTCPeerConnectionFactory,
-                configuration: RTCConfiguration,
+    public init(factory: PeerConnectionFactory,
+                configuration: Configuration,
                 optional: PeerMediaOption = [.tlsSrtp],
                 logger: Logger? = nil) throws
     {
         self.factory = factory
-        self.configuration = configuration
-
+        
         let constraints = RTCMediaConstraints(mandatoryConstraints: nil,
                                               optionalConstraints: optional.dict)
 
         let connectionDelegate = PeerConnectionDelegate()
         self.connectionDelegate = connectionDelegate
 
-        guard let connection = factory.peerConnection(with: configuration, constraints: constraints, delegate: connectionDelegate) else {
+        guard let connection = factory.factory.peerConnection(with: .init(configuration), constraints: constraints, delegate: connectionDelegate) else {
             throw PeerConnectionError.cantCreateNewConnection
         }
 
@@ -64,13 +62,13 @@ public extension PeerConnection {
 }
 
 public extension PeerConnection {
-    convenience init(configuration: RTCConfiguration) throws {
-        try self.init(factory: Self.initializePeerConnectionFactory(), configuration: configuration)
+    convenience init(factory: PeerConnectionFactory, configuration: Configuration) throws {
+        try self.init(factory: factory, configuration: configuration)
     }
 
-    convenience init(iceServers: [IceServer]) throws {
-        let configuration = RTCConfiguration()
-        configuration.iceServers = iceServers.map(\.server)
+    convenience init(factory: PeerConnectionFactory, iceServers: [IceServer]) throws {
+        var configuration = Configuration()
+        configuration.iceServers = iceServers
 
         // Unified plan is more superior than planB
         configuration.sdpSemantics = .unifiedPlan
@@ -78,7 +76,7 @@ public extension PeerConnection {
         // gatherContinually will let WebRTC to listen to any network changes and send any new candidates to the other client
         configuration.continualGatheringPolicy = .gatherContinually
 
-        try self.init(configuration: configuration)
+        try self.init(factory: factory, configuration: configuration)
     }
 }
 

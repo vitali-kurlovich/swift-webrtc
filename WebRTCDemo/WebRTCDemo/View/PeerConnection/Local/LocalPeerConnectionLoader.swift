@@ -24,7 +24,7 @@ struct LocalPeerConnectionLoader: View {
                     do {
                         let iceServerURLs = appConfiguration.iceServers
                         let servers = iceServerURLs.map { IceServer(urlStrings: [$0]) }
-                        let secondary = try PeerConnection(iceServers: servers)
+                        let secondary = try PeerConnection(factory: .init(), iceServers: servers)
 
                         secondary.logger = Logger(label: "SecondaryLocalConnection")
 

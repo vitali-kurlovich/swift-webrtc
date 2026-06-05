@@ -36,7 +36,7 @@ final class ConnectionCoordinator {
 
         do {
             let servers = iceServers.map { IceServer(urlStrings: [$0]) }
-            let connection = try PeerConnection(iceServers: servers)
+            let connection = try PeerConnection(factory: .init(), iceServers: servers)
 
             connection.logger = LoggingEvents.default.webrct
 
